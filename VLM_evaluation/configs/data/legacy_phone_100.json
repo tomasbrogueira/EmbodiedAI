@@ -1,0 +1,15 @@
+{
+  "recipe": "legacy_phone",
+  "expected_frames": {"development": 20, "test": 80},
+  "robot_profile_id": "small_wheeled_v1",
+  "robot_policy": "Permit apparently dry floors, concrete, asphalt, compact soil and short grass, conditional on geometric feasibility. Avoid people, animals, liquids, mud, dense vegetation, fragile belongings, cables and loose obstacles. Unclear material or target identity is unknown.",
+  "rellis_recipe": {
+    "00000": {"keyframes": 10, "split": "development"},
+    "00001": {"keyframes": 15, "split": "test"},
+    "00002": {"keyframes": 15, "split": "test"},
+    "00003": {"keyframes": 15, "split": "test"},
+    "00004": {"keyframes": 15, "split": "test"}
+  },
+  "phone_recipe": {"A": {"split": "development", "keyframes": 10}, "B": {"split": "test", "keyframes": 10}, "C": {"split": "test", "keyframes": 10}},
+  "selection_seed": 0
+}

@@ -1,0 +1,39 @@
+# Local agent notes and prompts
+/.codex/
+/.codex-local/
+/research/traversability/memory.md
+/research/traversability/CLAUDE.md
+/research/traversability/attacks.md
+
+# Data, models and generated runs
+/data/
+/runs/
+/outputs/
+/models/
+/weights/
+/checkpoints/
+/results/
+/.cache/
+
+# Video inputs are transferred or downloaded separately on the compute host
+*.[mM][pP]4
+*.[mM][oO][vV]
+*.[aA][vV][iI]
+*.[mM][kK][vV]
+*.[wW][eE][bB][mM]
+*.[mM]4[vV]
+
+# Python and notebooks
+__pycache__/
+*.py[cod]
+.venv*/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+.ipynb_checkpoints/
+
+# Machine-local files
+.DS_Store
+.env
+.env.*
+!.env.example

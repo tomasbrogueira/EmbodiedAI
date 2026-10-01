@@ -1,0 +1,11 @@
+# Candidate isolated Python 3.12+ stack; no CUDA/hardware validation is claimed.
+# Choose matching CUDA torch/torchvision wheels from the official PyTorch index.
+# Official versioned sources and usage are linked in docs/hazard_inference.md.
+torch==2.10.0
+torchvision==0.25.0
+transformers==5.18.0
+accelerate==1.15.0
+bitsandbytes==0.50.2
+numpy==1.26.4
+Pillow==11.3.0
+huggingface-hub==1.31.0

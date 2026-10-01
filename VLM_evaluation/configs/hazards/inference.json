@@ -1,0 +1,20 @@
+{
+  "task_id": "hazard_prompt_v1",
+  "schema_version": 1,
+  "run_name": "hazard_prompt_v1",
+  "model_keys": ["qwen3_vl_4b", "qwen3_5_4b"],
+  "fallback_model_key": "qwen3_5_2b",
+  "settings": {
+    "visual_token_budget": 1024,
+    "context_token_limit": 2048,
+    "max_new_tokens": 256,
+    "language_quantization_bits": 4,
+    "request_concurrency": 1,
+    "enable_thinking": false,
+    "device": "cuda:0",
+    "seed": 0,
+    "local_files_only": true,
+    "fixture": false,
+    "retry_errors": false
+  }
+}
