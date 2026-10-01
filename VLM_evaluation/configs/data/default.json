@@ -1,0 +1,12 @@
+{
+  "recipe": "public_rellis_100",
+  "expected_frames": {"development": 20, "test": 80},
+  "robot_profile_id": "rellis_material_v1",
+  "robot_policy": "Dirt, asphalt and concrete are semantically permitted, conditional on geometric feasibility. Obstacles, liquids, mud, rubble and non-support classes are avoided. Grass and void are unresolved. This material policy does not establish physical traversability.",
+  "selection_seed": 0,
+  "reference_nonvoid_threshold": 0.95,
+  "reference_class_purity_threshold": 0.95,
+  "sam2_model": "tiny",
+  "sam2_config": "configs/sam2.1/sam2.1_hiera_t.yaml",
+  "sam2_device": "cpu"
+}

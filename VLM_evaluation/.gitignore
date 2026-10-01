@@ -1,0 +1,17 @@
+# Local data, weights, caches and generated artifacts
+/data/
+/runs/
+/outputs/
+/models/
+/weights/
+/checkpoints/
+/results/
+/visualization_outputs/
+/.cache/
+
+# Local agent material
+/.codex/
+/.codex-local/
+/research/traversability/memory.md
+/research/traversability/CLAUDE.md
+/research/traversability/attacks.md

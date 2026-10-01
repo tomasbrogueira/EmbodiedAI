@@ -1,0 +1,49 @@
+{
+  "task_id": "hazard_prompt_v1",
+  "schema_version": 1,
+  "policy_id": "visible_avoid_concepts_v1",
+  "robot_profile": "conservative_small_wheeled_semantic_policy",
+  "scope": "Visible concepts to avoid if encountered; geometry and path relevance are downstream.",
+  "canonical_prompts": ["tree", "pole", "water", "vehicle", "building", "log", "person", "fence", "bush", "barrier", "mud", "rubble", "cup", "bottle", "chair", "dog"],
+  "aliases": {
+    "tree": ["tree", "trees"],
+    "pole": ["pole", "poles", "utility pole", "utility poles"],
+    "water": ["water", "puddle", "puddles", "water puddle", "water puddles", "standing water"],
+    "vehicle": ["vehicle", "vehicles", "car", "cars", "truck", "trucks", "bus", "buses"],
+    "building": ["building", "buildings"],
+    "log": ["log", "logs", "fallen log", "fallen logs"],
+    "person": ["person", "people", "pedestrian", "pedestrians"],
+    "fence": ["fence", "fences"],
+    "bush": ["bush", "bushes", "shrub", "shrubs"],
+    "barrier": ["barrier", "barriers", "road barrier", "road barriers"],
+    "mud": ["mud", "muddy ground"],
+    "rubble": ["rubble", "debris"],
+    "cup": ["cup", "cups", "coffee cup", "coffee cups", "mug", "mugs"],
+    "bottle": ["bottle", "bottles"],
+    "chair": ["chair", "chairs"],
+    "dog": ["dog", "dogs"]
+  },
+  "vague_unusable_phrases": ["obstacle", "obstacles", "hazard", "hazards", "unsafe area", "non-traversable objects", "non traversable objects"],
+  "datasets": {
+    "rellis": {
+      "original_label_ids": {
+        "0": "void", "1": "dirt", "3": "grass", "4": "tree", "5": "pole", "6": "water", "7": "sky", "8": "vehicle", "9": "object", "10": "asphalt", "12": "building", "15": "log", "17": "person", "18": "fence", "19": "bush", "23": "concrete", "27": "barrier", "31": "puddle", "33": "mud", "34": "rubble"
+      },
+      "hazard_label_ids": {"tree": [4], "pole": [5], "water": [6, 31], "vehicle": [8], "building": [12], "log": [15], "person": [17], "fence": [18], "bush": [19], "barrier": [27], "mud": [33], "rubble": [34]},
+      "ignore_label_ids": [0, 3, 9],
+      "absence_scoring_max_ignored_fraction": 0.05
+    },
+    "coco": {
+      "scored_category_names": ["person", "cup", "bottle", "chair", "dog"],
+      "include_crowd_in_concept_union": true,
+      "scope": "Only the five annotated category concepts; no floor/contact predicate."
+    }
+  },
+  "presence_min_pixels": 1,
+  "tiny_concept_area_fraction": 0.001,
+  "max_prompts": 32,
+  "max_phrase_characters": 80,
+  "vlm_input": ["whole_RGB_image", "common_policy"],
+  "excluded_from_vlm_input": ["SAM_masks", "depth", "reference_masks", "image_specific_reference_names"],
+  "pending_coverage": ["cables", "independent spill/floor-contact cases", "phone hazard clips", "physical safety", "whole-pipeline temporal/fusion/planning"]
+}

@@ -1,0 +1,51 @@
+{
+  "run_name": "hazard_prompt_v1",
+  "model_keys": ["qwen3_vl_4b", "qwen3_5_4b"],
+  "fixture": false,
+  "policy_path": "configs/hazards/policy.json",
+  "hash_recipes": {"policy": "file_bytes", "aliases": "canonical_json"},
+  "dataset_fingerprint_recipe": "hazard_data_v1",
+  "coverage": {
+    "expected_frames": {
+      "rellis": {"development": 20, "test": 80},
+      "coco": {"development": 8, "test": 32}
+    }
+  },
+  "metadata_bindings": {
+    "dataset": {
+      "policy_hash": "/policy_sha256",
+      "alias_hash": "/alias_sha256",
+      "expected_frames": "/coverage/expected_frames_by_source_split",
+      "source_annotations": "/annotations",
+      "input_signature": "/observed_input_signature"
+    },
+    "model": {
+      "fixture": "/inputs/dataset/fixture",
+      "policy_hash": "/configuration/policy_sha256",
+      "alias_hash": "/configuration/alias_sha256",
+      "dataset_fingerprint": "/inputs/dataset/dataset_fingerprint",
+      "requested_frame_ids": "/inputs/frames",
+      "frozen_inputs": "/inputs",
+      "execution_kind": "/execution/kind",
+      "checkpoint_revision": "/configuration/model/revision",
+      "settings": "/configuration/settings"
+    },
+    "selection": {"policy_hash": "/policy_sha256"},
+    "segmentation_metadata": {"policy_hash": "/policy_sha256"},
+    "deployment_metadata": {"policy_hash": "/policy_sha256"},
+    "sam_settings": {
+      "checkpoint": "/checkpoint_repository",
+      "revision": "/checkpoint_revision"
+    }
+  },
+  "segmentation": {
+    "enabled": false,
+    "selection_path": "segmentation/selection.json",
+    "conditions": ["vlm__qwen3_vl_4b", "vlm__qwen3_5_4b", "reference_present", "fixed_policy"],
+    "completed_queries_semantics": "successful",
+    "selection_hash_recipe": "canonical_selection_dual",
+    "expected_test_per_source": {"rellis": 10, "coco": 10},
+    "expected_warmup_frames": 5
+  },
+  "deployment": {"profiles": []}
+}

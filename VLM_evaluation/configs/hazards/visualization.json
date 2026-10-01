@@ -1,0 +1,7 @@
+{
+  "run_name": "hazard_prompt_v1",
+  "data_root": null,
+  "run_root": null,
+  "output_dir": "visualization_outputs",
+  "export_enabled": false
+}

@@ -1,0 +1,22 @@
+{
+  "model_key": "clip_vit_b32",
+  "run_name": "rellis_material_v1",
+  "selection_seed": 0,
+  "warmup_frames": 5,
+  "test_frames": 20,
+  "measured_repeats": 2,
+  "component_budget_bytes": 6000000000,
+  "reference_policy_id": "rellis_material_v1",
+  "settings": {
+    "robot_profile_id": "rellis_material_v1",
+    "robot_policy": null,
+    "language_quantization_bits": 4,
+    "scene_visual_token_budget": 384,
+    "crop_visual_token_budget": 256,
+    "context_token_limit": 2048,
+    "max_new_tokens": 128,
+    "request_concurrency": 1,
+    "seed": 0,
+    "enable_thinking": false
+  }
+}

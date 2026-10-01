@@ -1,0 +1,5 @@
+# CPU saved-artifact viewer only. No inference or segmentation dependencies.
+Pillow>=11,<13
+numpy>=1.26,<2
+matplotlib>=3.8,<4
+ipywidgets>=8.1,<9
