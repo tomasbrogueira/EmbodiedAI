@@ -41,7 +41,8 @@ record real-model tests separately with actual hardware, weights and timing scop
 
 The [CPU workflow](.github/workflows/cpu-tests.yml) runs the top-level checks on
 Linux and Windows for pushes and pull requests, using Python 3.12 and the test
-requirements. Its first hosted run will happen after publication. The workflow
+requirements. Check the current commit's results in
+[GitHub Actions](https://github.com/tomasbrogueira/EmbodiedAI/actions). The workflow
 follows [GitHub's Python testing guidance](https://docs.github.com/en/actions/tutorials/build-and-test-code/python).
 
 Python sources use LF line endings through `.gitattributes`, so byte-level source

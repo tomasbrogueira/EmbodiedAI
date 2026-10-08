@@ -20,7 +20,7 @@ shared interfaces, common recordings, timing scopes and Sunday handoff.
 | Run storage | Fresh attempt reservation, unique output-root naming, lifecycle/failure records, atomic artifact writes and requested/resolved configuration snapshots |
 | Reproducibility | Input/config/source hashes, model identities, explicit timing scope, cache references and documented relocation limits |
 | Tests | Independent temporary video-export fixtures, subprocess source paths, CPU dependency setup and Linux/Windows GitHub checks |
-| Cleanup | Private server-monitor/batch tests kept locally, OS metadata removed from publication, and bulk outputs/environments/caches ignored |
+| Cleanup | Private server-monitor, batch and recovery tests kept locally, OS metadata removed from publication, and bulk outputs/environments/caches ignored |
 | Available results | A compact, hashed historical Tomás pilot with original metadata and three representative images |
 
 The route-viewer checksum allowlist now includes the reviewed current route
@@ -35,12 +35,18 @@ files also bypass line-ending conversion.
 
 ## Verification
 
-The top-level CPU suite passed against an exact copy of the publishable source
-files: **500 tests and 430 subtests passed; nine Linux-only process tests were
-skipped on Windows**. The copy contained no local outputs, private helpers,
-model submodule checkouts or recorded videos. This is a source-copy check, not
-an actual Git clone. Tests generate their analytic inputs and do not load model
-weights.
+The first hosted run for `81c3050` failed collection because a private recovery
+test imported absolute paths from the original workspace. The earlier 500-test
+local result therefore did not establish fresh-clone isolation. Those 12 private
+checks are now preserved locally outside the public suite.
+
+The final public CPU suite passed against a fresh copy of the publishable source
+files with inherited `PYTHONPATH` removed: **488 tests and 430 subtests passed;
+nine Linux-only process tests were skipped on Windows**. The copy contained no
+local outputs, private helpers, model submodule checkouts or recorded videos.
+This is a source-copy check, not an actual Git clone. Tests generate their
+analytic inputs and do not load model weights. Hosted checks below independently
+verify actual Linux and Windows Git checkouts.
 
 Checks used Python 3.12.13, NumPy 1.26.4, Pillow 11.3.0, OpenCV 4.11.0.86 and
 pytest 9.1.1 in a separate CPU environment. Shared runtime/storage tests and the
