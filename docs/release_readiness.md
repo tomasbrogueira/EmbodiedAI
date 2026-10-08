@@ -27,7 +27,9 @@ The route-viewer checksum allowlist now includes the reviewed current route
 exporter and retains the historical exporter pin. Exporter behavior and running
 workloads were preserved. A Qwen CPU test now supplies a drive-qualified absolute
 cache path on Windows and checks the processor and model cache paths exactly;
-production model-loading code and checkpoint pins were preserved.
+production model-loading code and checkpoint pins were preserved. Shared CPU
+fixtures resolve temporary roots before comparing paths, so Windows short-folder
+aliases match the canonical paths returned by the application.
 
 Git keeps Python sources in LF form and preserves committed JSON bytes so
 encoded policy checksums survive Windows/Linux checkouts. Historical report

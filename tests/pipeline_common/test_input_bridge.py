@@ -59,7 +59,7 @@ class InputBridgeTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
-        self.root = Path(self.temporary.name)
+        self.root = Path(self.temporary.name).resolve()
         # Unequal channels and varied pixels reveal RGB swaps/crops/re-encoding.
         self.rgb = (np.arange(3 * 5 * 3).reshape(3, 5, 3) * 5 + 17).astype(np.uint8)
         self.path = self.root / "processed.png"

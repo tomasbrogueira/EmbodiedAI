@@ -69,7 +69,7 @@ class FixedHazardsTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory()
         self.addCleanup(self.temporary.cleanup)
-        self.root = Path(self.temporary.name)
+        self.root = Path(self.temporary.name).resolve()
         rgb = np.arange(4 * 6 * 3, dtype=np.uint8).reshape((4, 6, 3))
         image_path = self.root / "processed.png"
         Image.fromarray(rgb).save(image_path)
