@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "research_illustration": true,
+  "assumption_id": "research_illustration_v1",
+  "metres_per_native_unit": 1.0,
+  "robot": {
+    "version": "assumed_small_robot_v1",
+    "fixture": true,
+    "footprint_radius": 0.1,
+    "height": 0.35,
+    "clearance": 0.02,
+    "max_slope_degrees": 25.0,
+    "max_step": 0.08,
+    "max_roughness": 0.05,
+    "min_support_points": 3,
+    "unknown_rule": "blocked",
+    "semantic_costs": {}
+  },
+  "grid_resolution_m": 0.1,
+  "max_grid_cells": 250000,
+  "ground_estimation": {
+    "mode": "camera_up_constrained_ransac",
+    "max_up_deviation_degrees": 35.0,
+    "plane_tolerance_m": 0.06,
+    "iterations": 160,
+    "max_fit_points": 6000,
+    "min_inliers": 30,
+    "min_inlier_fraction": 0.03,
+    "max_camera_below_plane_m": 0.05,
+    "random_seed": 0
+  },
+  "endpoint_policy": "camera_projected_then_largest_observed_component",
+  "minimum_endpoint_separation_m": 0.25
+}

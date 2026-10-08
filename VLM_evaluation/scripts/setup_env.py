@@ -231,6 +231,11 @@ def build_plan(args: argparse.Namespace) -> dict:
         ]
     constraint_flags = ["-c", str(env_dir / CONSTRAINTS_NAME)] if constraints else []
     commands = [{"label": "base", "argv": [*pip, *source_flags, "-r", str(requirements[0])]}]
+    if hazard_gpu:
+        # Base tooling may select newer setuptools. Install SAM3's compatible
+        # pin before CUDA, whose wheel index need not provide build tooling.
+        commands.append({"label": "tooling", "argv": [*pip, *source_flags, *constraint_flags,
+                                                     f"setuptools=={HAZARD_GPU_VERSIONS['setuptools']}"]})
     if args.cuda:
         cuda_source = source_flags if args.offline else [*source_flags, "--index-url", args.torch_index_url]
         commands.append({"label": "cuda", "argv": [*pip, *cuda_source, *constraint_flags, *constraints[:2]]})

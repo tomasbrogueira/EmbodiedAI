@@ -132,6 +132,18 @@ not an installed or model-tested CUDA environment.
 | setuptools | 80.9.0 | The [pinned SAM3 builder](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/sam3/model_builder.py) imports `pkg_resources`; retain a release providing it |
 | SAM3 code | 2345a4ad109ac29c569da749c91d84f10dc08c40 | One pinned official image-model path for every condition |
 
+The shared `regex==2025.10.22` pin satisfies Transformers 5.18.0's
+`regex>=2025.10.22` requirement, as confirmed by installed distribution metadata
+on KTH. Dependency consistency does not establish GPU or model compatibility.
+
+The SAM3 fragment also pins `einops==0.8.1`, `psutil==7.0.0` and
+`pycocotools==2.0.11` for imports reached by the official image builder:
+[rotary embeddings](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/sam3/sam/rope.py),
+[video predictor](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/sam3/model/sam3_video_predictor.py), and
+[COCO loaders](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/sam3/train/data/coco_json_loaders.py).
+Upstream base metadata omits these, so `pip check` alone cannot validate SAM3
+runtime imports. OpenCV and decord imports are delayed until video operations.
+
 Read-only local `nvidia-smi` reported RTX 3000 Ada Laptop, compute capability 8.9,
 driver 596.58 and driver-supported CUDA 13.2. NVIDIA's
 [compatibility table](https://docs.nvidia.com/deploy/cuda-compatibility/minor-version-compatibility.html)

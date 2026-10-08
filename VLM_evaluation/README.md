@@ -41,8 +41,12 @@ pixels, with the all-query downstream mask saved separately.
 [The integration guide](docs/hazard_integration.md) gives the complete offline
 synthetic workflow, reproducible checks and artifact entry points. These fixtures
 verify software contracts and carry no real accuracy, latency or memory evidence.
-Real-data measurements, gated checkpoint loading, GPU generation, the proposed
-6 decimal GB VLM budget and joint VLM/SAM residency remain unmeasured.
+The KTH real-data run completed on 1 October 2026, including gated checkpoint
+loading, both Qwen models, four SAM conditions and eight deployment profiles.
+See [the recorded evidence and agreed pipeline recommendation](../docs/pipeline_candidates.md).
+The 6 decimal GB target applies to the VLM component; LingBot integration,
+semantic voxel fusion and whole-pipeline joint fit/performance still require
+their own measured replay.
 
 Module notes: [data](docs/hazard_data.md), [inference](docs/hazard_inference.md),
 [evaluation](docs/hazard_evaluation.md), [SAM](docs/hazard_segmentation.md),

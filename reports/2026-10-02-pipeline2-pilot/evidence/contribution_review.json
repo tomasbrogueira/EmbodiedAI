@@ -1,0 +1,70 @@
+{
+  "evidence_zip_sha256": "43ade17a41d3286d8046292baea8e856e3b83f5a9fefe5c24e4c56abe18d8693",
+  "pilot_status": "complete",
+  "runs": {
+    "indoor_adjacent_two_frame_smoke/geometry_only": {
+      "voxel_count": 706,
+      "frame_count": 2,
+      "semantic_rows": 0,
+      "models_executed": true,
+      "fixture": false,
+      "planning": "blocked_inputs"
+    },
+    "indoor_nine_frames/geometry_only": {
+      "voxel_count": 2980,
+      "frame_count": 9,
+      "semantic_rows": 0,
+      "models_executed": true,
+      "fixture": false,
+      "planning": "blocked_inputs"
+    },
+    "indoor_nine_frames/ground_surface": {
+      "voxel_count": 2980,
+      "frame_count": 9,
+      "semantic_rows": 2980,
+      "models_executed": true,
+      "fixture": false,
+      "planning": "blocked_inputs",
+      "positive_evidence_voxels": 13,
+      "zero_positive_evidence_voxels": 2967,
+      "evidence_threshold": 0.5,
+      "voxels_at_evidence_threshold": 0,
+      "positive_frame_support_histogram": {
+        "1": 13
+      },
+      "audited_semantic_rows": 2980
+    },
+    "outdoor_nine_frames/geometry_only": {
+      "voxel_count": 2233,
+      "frame_count": 9,
+      "semantic_rows": 0,
+      "models_executed": true,
+      "fixture": false,
+      "planning": "blocked_inputs"
+    },
+    "outdoor_nine_frames/ground_surface": {
+      "voxel_count": 2233,
+      "frame_count": 9,
+      "semantic_rows": 2233,
+      "models_executed": true,
+      "fixture": false,
+      "planning": "blocked_inputs",
+      "positive_evidence_voxels": 227,
+      "zero_positive_evidence_voxels": 2006,
+      "evidence_threshold": 0.5,
+      "voxels_at_evidence_threshold": 181,
+      "positive_frame_support_histogram": {
+        "1": 42,
+        "2": 35,
+        "3": 36,
+        "4": 20,
+        "5": 26,
+        "6": 16,
+        "7": 6,
+        "8": 15,
+        "9": 31
+      },
+      "audited_semantic_rows": 2233
+    }
+  }
+}

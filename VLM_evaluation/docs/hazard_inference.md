@@ -103,6 +103,17 @@ and its digest; retry history remains auditable. `raw_response` preserves the
 full decoded generation, including its terminal EOS token. Parsing excludes only
 that verified terminal EOS token.
 
+Generation explicitly stops on the union of EOS IDs declared by the loaded
+generation configuration, model/text configuration and checkpoint tokenizer.
+The pinned Qwen3.5-4B [text configuration](https://huggingface.co/Qwen/Qwen3.5-4B/blob/851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a/config.json)
+declares document EOS `248044` (`<|endoftext|>`), while its
+[tokenizer configuration](https://huggingface.co/Qwen/Qwen3.5-4B/blob/851bf6e806efd8d0a36b00ddf55e13ccb7b8cd0a/tokenizer_config.json)
+declares chat-turn EOS `248046` (`<|im_end|>`). That revision has no
+`generation_config.json`; inheriting only the text configuration's EOS would
+generate beyond the assistant turn's end. The explicit stop list is recorded
+in decoding metadata. The parser still removes exactly one verified terminal
+EOS and rejects any special tokens or other text inside the response.
+
 Resume requires compatible task/version, model/settings/policy and inputs.
 Completed predictions and errors are preserved unless error retry is explicitly
 selected. Duplicated identities, orphaned output, incompatible metadata and

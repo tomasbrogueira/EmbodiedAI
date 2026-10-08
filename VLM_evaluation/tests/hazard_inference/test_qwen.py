@@ -75,7 +75,7 @@ def fixture_runtime():
         model_loads=[], processor_loads=[], quantization_calls=[], template_calls=[],
         generation_calls=[], decode_calls=[], images=[], resized=[],
         raw='{"prompts":["person","puddle"]}', output_tokens=[3, 4, 2],
-        mutate_inputs=None, mutate_model=None, generation_error=None,
+        mutate_inputs=None, mutate_model=None, mutate_processor=None, generation_error=None,
         generated_override=None, decoded_override=None,
     )
     torch = ModuleType("torch")
@@ -172,7 +172,12 @@ def fixture_runtime():
                 raise state.generation_error
             if state.generated_override is not None:
                 return FakeTensor(state.generated_override)
-            return FakeTensor([kwargs["input_ids"].tolist()[0] + state.output_tokens])
+            output_tokens = state.output_tokens
+            for index, token in enumerate(output_tokens):
+                if token in kwargs["eos_token_id"]:
+                    output_tokens = output_tokens[:index + 1]
+                    break
+            return FakeTensor([kwargs["input_ids"].tolist()[0] + output_tokens])
 
     def model_loader(class_name):
         class Loader:
@@ -191,6 +196,8 @@ def fixture_runtime():
         def from_pretrained(checkpoint, **kwargs):
             state.processor_loads.append((checkpoint, kwargs))
             state.processor = FakeProcessor()
+            if state.mutate_processor:
+                state.mutate_processor(state.processor)
             return state.processor
 
     def quantization_config(**kwargs):
@@ -246,18 +253,21 @@ class QwenCPUFixtureTests(unittest.TestCase):
         return backend
 
     def test_all_pinned_models_explicit_quantization_and_native_dtypes(self):
+        # Include the drive on Windows so this is an absolute external cache.
+        cache_dir = str((Path(ROOT.anchor) / "external" / "cache").resolve())
         for native in (True, False):
             for key in ("qwen3_vl_4b", "qwen3_5_4b", "qwen3_5_2b"):
                 with self.subTest(model=key, native_bf16=native):
                     self.state.native_bf16 = native
-                    backend = self.backend(key, cache_dir="/external/cache")
+                    backend = self.backend(key, cache_dir=cache_dir)
                     cls, checkpoint, kwargs = self.state.model_loads[-1]
                     spec = MODEL_SPECS[key]
                     self.assertEqual((cls, checkpoint, kwargs["revision"]),
                                      (spec["model_class"], spec["checkpoint"], spec["revision"]))
                     self.assertEqual(kwargs["device_map"], {"": "cuda:0"})
                     self.assertTrue(kwargs["local_files_only"])
-                    self.assertEqual(kwargs["cache_dir"], str(Path("/external/cache").resolve()))
+                    self.assertEqual(kwargs["cache_dir"], cache_dir)
+                    self.assertEqual(self.state.processor_loads[-1][1]["cache_dir"], cache_dir)
                     self.assertEqual(kwargs["attn_implementation"], "sdpa")
                     self.assertFalse(kwargs["use_kernels"])
                     dtype = "torch.bfloat16" if native else "torch.float16"
@@ -330,10 +340,48 @@ class QwenCPUFixtureTests(unittest.TestCase):
         self.assertEqual(self.state.model_loads[-1][2]["dtype"], "torch.float16")
         self.assertIn("device_capability", backend.metadata["quantization"]["native_bf16_check"])
 
-    def test_effective_generation_eos_has_priority_over_tokenizer_eos(self):
+    def test_generation_and_tokenizer_eos_are_both_explicit_stops(self):
         self.state.mutate_model = lambda model: setattr(model.generation_config, "eos_token_id", [5])
-        result = self.backend().predict_image(FRAME, "/unused")
-        self.assertEqual(result["error_code"], "generation_unverified_stop")
+        backend = self.backend()
+        result = backend.predict_image(FRAME, "/unused")
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(self.state.generation_calls[-1]["eos_token_id"], [2, 5])
+        self.assertEqual(backend.metadata["decoding"]["eos_token_ids"], [2, 5])
+
+    def test_qwen35_document_and_chat_eos_stop_at_chat_turn_end(self):
+        # The pinned 4B checkpoint has no generation_config.json. Transformers
+        # synthesizes document EOS 248044 from text_config; its tokenizer uses
+        # chat EOS 248046. Reproduce the suffix that previously ran past im_end.
+        def pinned_eos(model):
+            model.generation_config.eos_token_id = 248044
+            model.config.eos_token_id = None
+            model.config.text_config = SimpleNamespace(eos_token_id=248044)
+
+        self.state.mutate_model = pinned_eos
+        self.state.mutate_processor = lambda processor: setattr(processor.tokenizer, "eos_token_id", 248046)
+        self.state.output_tokens = [3, 248046, 8, 248044]
+        token_text = {3: '{"prompts":[]}', 248046: "<|im_end|>", 8: "\n", 248044: "<|endoftext|>"}
+        self.state.decoded_override = lambda rows: ["".join(token_text[token] for token in rows[0])]
+        backend = self.backend()
+        result = backend.predict_image(FRAME, "/unused")
+        self.assertEqual(self.state.generation_calls[-1]["eos_token_id"], [248044, 248046])
+        self.assertEqual(backend.metadata["decoding"]["eos_token_ids"], [248044, 248046])
+        self.assertEqual(result["status"], "ok")
+        self.assertEqual(result["prompts"], [])
+        self.assertEqual(result["raw_response"], '{"prompts":[]}<|im_end|>')
+        self.assertEqual(backend.last_diagnostics["parse_response_text"], '{"prompts":[]}')
+        self.assertEqual(backend.last_diagnostics["generation"]["eos_token_id"], 248046)
+        self.assertEqual(backend.last_diagnostics["tokens"]["output_tokens"], 2)
+
+    def test_nested_text_eos_is_audited_even_without_generation_config(self):
+        def nested_eos(model):
+            model.generation_config = None
+            model.config.eos_token_id = None
+            model.config.text_config = SimpleNamespace(eos_token_id=[5, True, -1, "6"])
+
+        self.state.mutate_model = nested_eos
+        backend = self.backend()
+        self.assertEqual(backend.metadata["decoding"]["eos_token_ids"], [2, 5])
 
     def test_cap_without_eos_is_error_even_when_decoded_json_is_valid(self):
         self.state.output_tokens = [3] * 256
@@ -371,7 +419,8 @@ class QwenCPUFixtureTests(unittest.TestCase):
 
     def test_strict_parse_errors_retain_full_raw_and_valid_empty_is_ok(self):
         for raw in ('```json\n{"prompts":[]}\n```', '{"prompts":[],"other":1}',
-                    '{"prompts":[""]}', '{"prompts":null}', '{"prompts":[],"prompts":[]}'):
+                    '{"prompts":[""]}', '{"prompts":null}', '{"prompts":[],"prompts":[]}',
+                    '{"prompts":[]}<|im_end|>\n'):
             with self.subTest(raw=raw):
                 self.state.raw = raw
                 result = self.backend().predict_image(FRAME, "/unused")

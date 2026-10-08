@@ -1,0 +1,32 @@
+{
+  "capabilities": {
+    "free_space": false,
+    "physical_navigation_validated": false,
+    "semantic": true
+  },
+  "config_digest": "9c4af66a073f0bc3ac16ef0dc37eea18aa7271bf261433768f202dced3f5be01",
+  "contract_id": "semantic_mapping_v1",
+  "elapsed_s": 22.8766305,
+  "fixture": false,
+  "geometry_identity": {
+    "geometry_fingerprint": "7a40392a9b204982e7104b8abde79efd93ef103b3e1c12117c63ea6cb8a32d2b",
+    "input_fingerprint": "0c9ac19caea354715ffb5e42097f4f6b4e7af3a1f2c58548335c00ea6ca0cc5a",
+    "pose_revision": "initial",
+    "processed_grid_id": "89e82a4809094283f34aefc199852c5e205aa4a4eedccd6b553394ec8d36b254",
+    "scale": {},
+    "units": "reconstruction_units",
+    "up": null
+  },
+  "mode": "quality_replay",
+  "pipeline_id": "ground_surface",
+  "planning_status": "blocked_inputs",
+  "protocol_id": "semantic_mapping_eval_v1",
+  "schema_version": 1,
+  "sequence": {
+    "frame_count": 9,
+    "manifest_digest": "adb515cf73364f0480c7361e89bd08c94fbc5a5a466d1f27ccfce2f06686fb77",
+    "sequence_id": "indoor_nine_frames",
+    "split": "development"
+  },
+  "status": "complete"
+}

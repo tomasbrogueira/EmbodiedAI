@@ -279,16 +279,21 @@ class QwenBackend:
         }
 
     def _eos_token_ids(self):
+        # A checkpoint may synthesize its generation config from the text
+        # config's document EOS while its tokenizer uses a different chat-turn
+        # EOS. Both are legitimate stopping tokens; stopping only on the former
+        # lets an assistant's <|im_end|> become part of the JSON response.
+        result = set()
+        config = getattr(self.model, "config", None)
         for source in (getattr(self.model, "generation_config", None),
-                       getattr(self.model, "config", None), self.processor.tokenizer):
+                       config, getattr(config, "text_config", None),
+                       self.processor.tokenizer):
             value = getattr(source, "eos_token_id", None)
             if type(value) is int and value >= 0:
-                return {value}
+                result.add(value)
             elif isinstance(value, (list, tuple)):
-                result = {item for item in value if type(item) is int and item >= 0}
-                if result:
-                    return result
-        return set()
+                result.update(item for item in value if type(item) is int and item >= 0)
+        return result
 
     def _prepare_inputs(self, rgb):
         image = resize_aligned(rgb, self.settings["visual_token_budget"] * self._factor**2, self._factor)
@@ -379,6 +384,7 @@ class QwenBackend:
                     generated = self.model.generate(
                         **inputs, do_sample=False, num_beams=1, num_return_sequences=1,
                         repetition_penalty=1.0, max_new_tokens=self.settings["max_new_tokens"],
+                        eos_token_id=sorted(self._eos_ids),
                         use_cache=True, return_dict_in_generate=False,
                     )
                 rows = _tolist(generated)

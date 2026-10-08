@@ -13,7 +13,8 @@ from .coco import safe_image_name
 from .storage import data_path, exclusive_lock, hash_file, publish_file, read_json, read_jsonl
 
 
-ANNOTATION_URL = "https://images.cocodataset.org/annotations/annotations_trainval2017.zip"
+# Publisher download URL; this S3-backed hostname has no matching HTTPS certificate.
+ANNOTATION_URL = "http://images.cocodataset.org/annotations/annotations_trainval2017.zip"
 ANNOTATION_MEMBER = "annotations/instances_val2017.json"
 
 

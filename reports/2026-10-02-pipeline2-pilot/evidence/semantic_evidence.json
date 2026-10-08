@@ -1,0 +1,58 @@
+{
+  "indoor_nine_frames": {
+    "total_rows": 2980,
+    "nonzero_positive_rows": 13,
+    "distinct_positive_voxels": 13,
+    "zero_positive_rows": 2967,
+    "frame_support_histogram_all_rows": {
+      "1": 1830,
+      "2": 678,
+      "3": 355,
+      "4": 81,
+      "5": 27,
+      "6": 9
+    },
+    "frame_support_histogram_positive_rows": {
+      "2": 1,
+      "3": 12
+    },
+    "positive_score_range": [
+      0.3018010664685604,
+      0.46183361584110016
+    ],
+    "interpretation": "uncalibrated candidate-surface evidence; zero positive evidence is not verified free space; physical planning blocked"
+  },
+  "outdoor_nine_frames": {
+    "total_rows": 2233,
+    "nonzero_positive_rows": 227,
+    "distinct_positive_voxels": 227,
+    "zero_positive_rows": 2006,
+    "frame_support_histogram_all_rows": {
+      "1": 701,
+      "2": 732,
+      "3": 384,
+      "4": 168,
+      "5": 102,
+      "6": 58,
+      "7": 27,
+      "8": 21,
+      "9": 40
+    },
+    "frame_support_histogram_positive_rows": {
+      "1": 19,
+      "2": 24,
+      "3": 29,
+      "4": 27,
+      "5": 32,
+      "6": 25,
+      "7": 17,
+      "8": 14,
+      "9": 40
+    },
+    "positive_score_range": [
+      0.08732182116352785,
+      0.921875
+    ],
+    "interpretation": "uncalibrated candidate-surface evidence; zero positive evidence is not verified free space; physical planning blocked"
+  }
+}

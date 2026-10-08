@@ -54,6 +54,10 @@ Four tabs provide:
   Baselines, increments, unavailable reasons, phase memory, loading, budget
   provenance and full original profile rows remain in details and export
   sidecars. Invalid profiles with missing component identity show `unavailable`.
+  Missing native profiles use the validated summary path's planned condition,
+  prefixed `expected:`, to distinguish selector entries that share a profile ID.
+  This preserves every pending row without supplying measured component,
+  condition, validity or resource evidence; observed row fields stay unchanged.
   No isolated stage p95/peak values are added.
 
 Report `concepts.rows` has nested `metrics`; `concepts.per_concept` and SAM rows

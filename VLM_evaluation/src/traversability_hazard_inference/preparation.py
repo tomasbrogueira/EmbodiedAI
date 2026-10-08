@@ -12,6 +12,10 @@ def load_rgb(frame, data_root):
     """Return an owned original-size RGB image; never inspect other assets."""
     from PIL import Image
 
+    if frame.get("input_contract_id") is not None:
+        from pipeline_common.input_bridge import load_model_rgb
+        return load_model_rgb(frame, data_root)
+
     try:
         path = safe_path(data_root, frame["image_path"])
         contents = path.read_bytes()

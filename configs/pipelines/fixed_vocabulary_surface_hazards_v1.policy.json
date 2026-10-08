@@ -1,0 +1,357 @@
+{
+  "task_id": "hazard_prompt_v1",
+  "schema_version": 1,
+  "policy_id": "fixed_vocabulary_surface_hazards_v1",
+  "vocabulary_mode": "explicit_concepts_v1",
+  "scope": "Unmeasured larger fixed SAM3 vocabulary for project video comparison; candidate surfaces still require geometry and robot checks. No benchmark reference-label mapping is declared.",
+  "canonical_prompts": [
+    "tree",
+    "pole",
+    "water",
+    "vehicle",
+    "building",
+    "log",
+    "person",
+    "fence",
+    "bush",
+    "barrier",
+    "mud",
+    "rubble",
+    "cup",
+    "bottle",
+    "chair",
+    "dog",
+    "floor",
+    "ground",
+    "path",
+    "sidewalk",
+    "pavement",
+    "asphalt",
+    "concrete",
+    "dirt road",
+    "gravel",
+    "stairs",
+    "step",
+    "wall",
+    "rock",
+    "cable",
+    "bicycle",
+    "bench"
+  ],
+  "concepts": [
+    {
+      "phrase": "tree",
+      "concept_id": "tree",
+      "role": "hazard"
+    },
+    {
+      "phrase": "pole",
+      "concept_id": "pole",
+      "role": "hazard"
+    },
+    {
+      "phrase": "water",
+      "concept_id": "water",
+      "role": "hazard"
+    },
+    {
+      "phrase": "vehicle",
+      "concept_id": "vehicle",
+      "role": "hazard"
+    },
+    {
+      "phrase": "building",
+      "concept_id": "building",
+      "role": "hazard"
+    },
+    {
+      "phrase": "log",
+      "concept_id": "log",
+      "role": "hazard"
+    },
+    {
+      "phrase": "person",
+      "concept_id": "person",
+      "role": "hazard"
+    },
+    {
+      "phrase": "fence",
+      "concept_id": "fence",
+      "role": "hazard"
+    },
+    {
+      "phrase": "bush",
+      "concept_id": "bush",
+      "role": "hazard"
+    },
+    {
+      "phrase": "barrier",
+      "concept_id": "barrier",
+      "role": "hazard"
+    },
+    {
+      "phrase": "mud",
+      "concept_id": "mud",
+      "role": "hazard"
+    },
+    {
+      "phrase": "rubble",
+      "concept_id": "rubble",
+      "role": "hazard"
+    },
+    {
+      "phrase": "cup",
+      "concept_id": "cup",
+      "role": "hazard"
+    },
+    {
+      "phrase": "bottle",
+      "concept_id": "bottle",
+      "role": "hazard"
+    },
+    {
+      "phrase": "chair",
+      "concept_id": "chair",
+      "role": "hazard"
+    },
+    {
+      "phrase": "dog",
+      "concept_id": "dog",
+      "role": "hazard"
+    },
+    {
+      "phrase": "floor",
+      "concept_id": "ground_surface",
+      "role": "candidate_surface"
+    },
+    {
+      "phrase": "ground",
+      "concept_id": "ground_surface",
+      "role": "candidate_surface"
+    },
+    {
+      "phrase": "path",
+      "concept_id": "ground_surface",
+      "role": "candidate_surface"
+    },
+    {
+      "phrase": "sidewalk",
+      "concept_id": "ground_surface",
+      "role": "candidate_surface"
+    },
+    {
+      "phrase": "pavement",
+      "concept_id": "ground_surface",
+      "role": "candidate_surface"
+    },
+    {
+      "phrase": "asphalt",
+      "concept_id": "ground_surface",
+      "role": "candidate_surface"
+    },
+    {
+      "phrase": "concrete",
+      "concept_id": "ground_surface",
+      "role": "candidate_surface"
+    },
+    {
+      "phrase": "dirt road",
+      "concept_id": "ground_surface",
+      "role": "candidate_surface"
+    },
+    {
+      "phrase": "gravel",
+      "concept_id": "ground_surface",
+      "role": "candidate_surface"
+    },
+    {
+      "phrase": "stairs",
+      "concept_id": "stairs",
+      "role": "hazard"
+    },
+    {
+      "phrase": "step",
+      "concept_id": "step",
+      "role": "hazard"
+    },
+    {
+      "phrase": "wall",
+      "concept_id": "wall",
+      "role": "hazard"
+    },
+    {
+      "phrase": "rock",
+      "concept_id": "rock",
+      "role": "hazard"
+    },
+    {
+      "phrase": "cable",
+      "concept_id": "cable",
+      "role": "hazard"
+    },
+    {
+      "phrase": "bicycle",
+      "concept_id": "bicycle",
+      "role": "hazard"
+    },
+    {
+      "phrase": "bench",
+      "concept_id": "bench",
+      "role": "hazard"
+    }
+  ],
+  "aliases": {
+    "tree": [
+      "tree",
+      "trees"
+    ],
+    "pole": [
+      "pole",
+      "poles",
+      "utility pole",
+      "utility poles"
+    ],
+    "water": [
+      "water",
+      "puddle",
+      "puddles",
+      "water puddle",
+      "water puddles",
+      "standing water"
+    ],
+    "vehicle": [
+      "vehicle",
+      "vehicles",
+      "car",
+      "cars",
+      "truck",
+      "trucks",
+      "bus",
+      "buses"
+    ],
+    "building": [
+      "building",
+      "buildings"
+    ],
+    "log": [
+      "log",
+      "logs",
+      "fallen log",
+      "fallen logs"
+    ],
+    "person": [
+      "person",
+      "people",
+      "pedestrian",
+      "pedestrians"
+    ],
+    "fence": [
+      "fence",
+      "fences"
+    ],
+    "bush": [
+      "bush",
+      "bushes",
+      "shrub",
+      "shrubs"
+    ],
+    "barrier": [
+      "barrier",
+      "barriers",
+      "road barrier",
+      "road barriers"
+    ],
+    "mud": [
+      "mud",
+      "muddy ground"
+    ],
+    "rubble": [
+      "rubble",
+      "debris"
+    ],
+    "cup": [
+      "cup",
+      "cups",
+      "coffee cup",
+      "coffee cups",
+      "mug",
+      "mugs"
+    ],
+    "bottle": [
+      "bottle",
+      "bottles"
+    ],
+    "chair": [
+      "chair",
+      "chairs"
+    ],
+    "dog": [
+      "dog",
+      "dogs"
+    ],
+    "floor": [
+      "floor"
+    ],
+    "ground": [
+      "ground"
+    ],
+    "path": [
+      "path"
+    ],
+    "sidewalk": [
+      "sidewalk"
+    ],
+    "pavement": [
+      "pavement"
+    ],
+    "asphalt": [
+      "asphalt"
+    ],
+    "concrete": [
+      "concrete"
+    ],
+    "dirt road": [
+      "dirt road"
+    ],
+    "gravel": [
+      "gravel"
+    ],
+    "stairs": [
+      "stairs"
+    ],
+    "step": [
+      "step"
+    ],
+    "wall": [
+      "wall"
+    ],
+    "rock": [
+      "rock"
+    ],
+    "cable": [
+      "cable"
+    ],
+    "bicycle": [
+      "bicycle"
+    ],
+    "bench": [
+      "bench"
+    ]
+  },
+  "vague_unusable_phrases": [
+    "obstacle",
+    "obstacles",
+    "hazard",
+    "hazards",
+    "unsafe area",
+    "non-traversable objects",
+    "non traversable objects"
+  ],
+  "max_prompts": 32,
+  "max_phrase_characters": 80,
+  "selection": {
+    "frozen": true,
+    "selection_split": "development",
+    "basis": "meeting_larger_vocabulary_starting_proposal_unmeasured"
+  }
+}

@@ -60,6 +60,13 @@ transfer a model when given `"cuda:0"`. Missing code, checkpoint, dependencies o
 CUDA produce `SegmenterUnavailable` with a diagnostic error code. There is no
 SAM2, Transformers grounding, random-weight or CPU real-model fallback.
 
+Real processor calls scope CUDA inference mode and BF16 autocast to the selected
+device, following the [pinned official image example](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/examples/sam3_image_predictor_example.ipynb).
+The fused image layers produce BF16 tensors; their floating outputs are promoted
+to float32 before NumPy capture. Fixture calls do not import Torch or enable CUDA
+contexts. These settings describe execution; they do not establish GPU fit or
+complete benchmark validation.
+
 ## Processor behavior and records
 
 The [pinned processor](https://github.com/facebookresearch/sam3/blob/2345a4ad109ac29c569da749c91d84f10dc08c40/sam3/model/sam3_image_processor.py)

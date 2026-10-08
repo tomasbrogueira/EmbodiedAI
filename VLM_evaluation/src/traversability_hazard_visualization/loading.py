@@ -1,7 +1,7 @@
 """Index JSON evidence once; read only selected RGB and original-size masks."""
 
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 import os
 
 import numpy as np
@@ -53,14 +53,21 @@ def check_output_directory(output, data, runs, component):
 def profile_identity(row):
     # Native report rows retain summary_path rather than a separate profile_id.
     profile = row.get("profile_id")
+    path = row.get("summary_path")
     if not profile:
-        path = row.get("summary_path")
         if not path:
             raise ArtifactError("Deployment row has no profile identity")
-        profile = Path(path).parent.name
+        profile = PurePosixPath(path).parent.name
     # Rejected profiles may have only summary_path plus an error. Preserve them
-    # visibly without inferring their component from a directory name.
-    return (row.get("component", "unavailable"), row.get("condition_key", "unavailable"), profile)
+    # visibly without inferring measured component/condition fields. A validated
+    # native summary path can distinguish their expected condition in the key;
+    # the original report row and its unavailable measurements remain unchanged.
+    condition = row.get("condition_key", "unavailable")
+    if condition in (None, "", "unavailable") and path:
+        parts = PurePosixPath(path).parts
+        if len(parts) == 4 and parts[0] == "benchmark" and parts[-1] == "summary.json":
+            condition = "expected:" + parts[1]
+    return (row.get("component", "unavailable"), condition, profile)
 
 
 @dataclass
@@ -167,11 +174,13 @@ def load_run(config=None):
             _identity(row)
         if "fixture" in row and row["fixture"] != report["fixture"]:
             raise ArtifactError("Deployment/report fixture identity mismatch")
+        if row.get("summary_path"):
+            # Validate containment before using native path components as an
+            # expected identity for unavailable profiles.
+            safe_path(run, row["summary_path"])
         key = profile_identity(row)
         if key in saved.profiles or any(not isinstance(v, str) or not v for v in key):
             raise ArtifactError(f"Invalid or duplicate deployment profile identity: {key}")
-        if row.get("summary_path"):
-            safe_path(run, row["summary_path"])
         saved.profiles[key] = row
     for filename, attribute in (("frames.jsonl", "frames"), ("references.jsonl", "references")):
         path = safe_path(run, filename)

@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "dataset_id": "tomas_joao_project_videos_v1",
+  "source_commit": "a13bc91bc1519c748934dd9df5dc5f0e45deb3a3",
+  "verified_on": "2026-10-09",
+  "file_count": 18,
+  "total_bytes": 261164118,
+  "files": [
+    {
+      "path": "indoor/IMG_5506.mp4",
+      "size_bytes": 4938240,
+      "sha256": "9476bd0d8c8d27aaf8d96fab3d1073534813eaa6e8378900a67f6c7dc860e849",
+      "original_git_blob": "56202fcc66c01d9e716d336583cf669d9a6ddf0d"
+    },
+    {
+      "path": "indoor/IMG_5507.mp4",
+      "size_bytes": 6461232,
+      "sha256": "d400e1f2200979e46750fc40caa3e70f6d16e6f925b73797c11f1a715c33996e",
+      "original_git_blob": "85648c054fd0836c10bd8eb05268bbd349d5a609"
+    },
+    {
+      "path": "indoor/IMG_5508.mp4",
+      "size_bytes": 11188538,
+      "sha256": "77b706329c75a53a1cdee663c717a97c9f943752f16b3c3be8b215efb472d82e",
+      "original_git_blob": "480ffb7fd3f79c746540a05a4a063d59d224c9f6"
+    },
+    {
+      "path": "indoor/IMG_5522.mp4",
+      "size_bytes": 4949946,
+      "sha256": "86d5699aa6bbe261d72bedb23861ca4a90db3eb4fc79638dd229aa2cd52bccdb",
+      "original_git_blob": "e7a7e97e354cac433e82d478e15d9205f3b8dc26"
+    },
+    {
+      "path": "indoor/IMG_5523.mp4",
+      "size_bytes": 5254455,
+      "sha256": "dce0ff6f207c85a88b8fad7b7511c3f4a49dbe658ced5c7fda74adc5966cf4b9",
+      "original_git_blob": "b1b05a8b6eaf4aeddbb7bf3e28ab84a0138775de"
+    },
+    {
+      "path": "outdoor/IMG_5509.mp4",
+      "size_bytes": 10936589,
+      "sha256": "b1fba776e576c7208262afc40bde04d03e3940be81306e485ae4939ba29e2995",
+      "original_git_blob": "3b969ebb61f9d8dae4e6379270a062d1bc998574"
+    },
+    {
+      "path": "outdoor/IMG_5510.mp4",
+      "size_bytes": 8127628,
+      "sha256": "dca0605ad66ef939686b3cf5c53c4ea11f2b9f003aeefd53d9825e07ee0e63be",
+      "original_git_blob": "f6cae70eda689c1fff4a0c45d80f1943ebb94038"
+    },
+    {
+      "path": "outdoor/IMG_5511.mp4",
+      "size_bytes": 29404395,
+      "sha256": "c23ea5748c898944dac16ebba9d2ea42b710a7bc6c04476a35aac41a65128541",
+      "original_git_blob": "947375ddf3b74774aad4167f68d74c45e4695e29"
+    },
+    {
+      "path": "outdoor/IMG_5512.mp4",
+      "size_bytes": 42114690,
+      "sha256": "d9e8d5c3a05b67dae353d5b8f266feb28453a063d3cf7aeb6b18d49b22aec462",
+      "original_git_blob": "ab28faa37d4355581a7c8ee441aaf3e0cec1538b"
+    },
+    {
+      "path": "outdoor/IMG_5513.mp4",
+      "size_bytes": 11198424,
+      "sha256": "4b732f7a83ba60b23892a50f952147a5fffacffeda5c835058eb9a95e5a30071",
+      "original_git_blob": "91fcf009f4b99dbd636e875f8d0af2fa75ab9f49"
+    },
+    {
+      "path": "outdoor/IMG_5514.mp4",
+      "size_bytes": 49440145,
+      "sha256": "76710948f99206165c89dc361d69cb182397a9dd6d2e1e9b0927e50d2230a9c6",
+      "original_git_blob": "eba7fe0fca103efddceb4e4278221702d37a767e"
+    },
+    {
+      "path": "outdoor/IMG_5515.mp4",
+      "size_bytes": 19354298,
+      "sha256": "75f3af7b4553cf423b2e1aeedc78da53c8dccdea2867d87081228dd46484e5d0",
+      "original_git_blob": "4f0ec801d6715117434f775fe08a51d74d3397df"
+    },
+    {
+      "path": "outdoor/IMG_5516.mp4",
+      "size_bytes": 18837703,
+      "sha256": "fc493144406ff3862988243299190a2543df5ff77c9c616c95aa2665a793ee34",
+      "original_git_blob": "8fc4a3ca7b2f7fb52a197d3a5f56a1288855194f"
+    },
+    {
+      "path": "outdoor/IMG_5517.mp4",
+      "size_bytes": 23398964,
+      "sha256": "55cfb71e9bbd20197bcd93b0e19b14e5c0e14e829f73727505f6977689d6c8e0",
+      "original_git_blob": "f8d17ab582be4d71198ffd1a7efd0cffa7b33191"
+    },
+    {
+      "path": "outdoor/IMG_5518.mp4",
+      "size_bytes": 2934408,
+      "sha256": "8d9a1377b0f995dc9442034539786390e3f222f5e53c5b5d0d64c7f42aa92f07",
+      "original_git_blob": "2d5eba53d72934eeb336e44dfb82fa1f748a8efe"
+    },
+    {
+      "path": "outdoor/IMG_5519.mp4",
+      "size_bytes": 3141233,
+      "sha256": "d44e8bdfdb7d532515b182d6b1b8ced6d9e8a2712ef0eda7ea821844e1a03335",
+      "original_git_blob": "a86bb41a24ccb5dcf3377f6ace6d98bacd0643bb"
+    },
+    {
+      "path": "outdoor/IMG_5520.mp4",
+      "size_bytes": 7055647,
+      "sha256": "5656ec9a6e4f47d7f709f41a251ce974797d1745c5fc5786b940248607692cd7",
+      "original_git_blob": "fe08459d48aa7e9676c2059df8c8801fbee34399"
+    },
+    {
+      "path": "outdoor/IMG_5521.mp4",
+      "size_bytes": 2427583,
+      "sha256": "915be40fbf407659d17cbe4ec75394639936431c9b0eea89f15068e7ca4972b5",
+      "original_git_blob": "8ad7e48decbf859bd8ab1dad28b55947497b8adb"
+    }
+  ]
+}

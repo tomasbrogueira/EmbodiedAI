@@ -1,0 +1,103 @@
+{
+  "snapshot_schema_version": 1,
+  "recorded_date": "2026-10-02",
+  "prepared_date": "2026-10-08",
+  "pipeline_id": "ground_surface",
+  "artifact_kind": "curated_historical_result_snapshot",
+  "complete_run_bundle": false,
+  "original_server_run": "/home/jovyan/EmbodiedAI-pipelines/outputs/kth_pipeline2_pilot_v5_20261002",
+  "files": [
+    {
+      "path": "evidence/indoor_nine_frames/run.json",
+      "original_local_path": "outputs/kth_pipeline2_execution/v5_evidence/outputs/kth_pipeline2_pilot_v5_20261002/indoor_nine_frames/ground_surface_run/run.json",
+      "sha256": "eb3e1cd1bad009eda965c8dbaa3e9082d12dec5833dbc3b21de3b0c5f3383e6c",
+      "size_bytes": 1101
+    },
+    {
+      "path": "evidence/indoor_nine_frames/config.resolved.json",
+      "original_local_path": "outputs/kth_pipeline2_execution/v5_evidence/outputs/kth_pipeline2_pilot_v5_20261002/indoor_nine_frames/ground_surface_run/config.resolved.json",
+      "sha256": "1318af4563fcb3d6af2cb6622c833a601b2a1dd8efaa292e0fc3241f13ffec7b",
+      "size_bytes": 5052
+    },
+    {
+      "path": "evidence/indoor_nine_frames/summary.json",
+      "original_local_path": "outputs/kth_pipeline2_execution/v5_evidence/outputs/kth_pipeline2_pilot_v5_20261002/indoor_nine_frames/ground_surface_run/summary.json",
+      "sha256": "1f056cdb3f948482ab064d6eb384b794cd31338407c3a91c0e1abb2a3db88180",
+      "size_bytes": 5809
+    },
+    {
+      "path": "evidence/indoor_nine_frames/evaluation.json",
+      "original_local_path": "outputs/kth_pipeline2_execution/v5_evidence/outputs/kth_pipeline2_pilot_v5_20261002/indoor_nine_frames/ground_surface_evaluation/report.json",
+      "sha256": "6e349f16996cac280e0b707123e9b3dcb8896b03bcc21a142911208f69e7037f",
+      "size_bytes": 22550
+    },
+    {
+      "path": "evidence/outdoor_nine_frames/run.json",
+      "original_local_path": "outputs/kth_pipeline2_execution/v5_evidence/outputs/kth_pipeline2_pilot_v5_20261002/outdoor_nine_frames/ground_surface_run/run.json",
+      "sha256": "549bc2cf8a10ca289d7669f8896a19a64163703e851d235b80c04ec6acfe5ceb",
+      "size_bytes": 1103
+    },
+    {
+      "path": "evidence/outdoor_nine_frames/config.resolved.json",
+      "original_local_path": "outputs/kth_pipeline2_execution/v5_evidence/outputs/kth_pipeline2_pilot_v5_20261002/outdoor_nine_frames/ground_surface_run/config.resolved.json",
+      "sha256": "f07491fc10e6f6bedc0bad2a21e45c3f8ce4c82e1a360e995d38fdc433c0bbd4",
+      "size_bytes": 5059
+    },
+    {
+      "path": "evidence/outdoor_nine_frames/summary.json",
+      "original_local_path": "outputs/kth_pipeline2_execution/v5_evidence/outputs/kth_pipeline2_pilot_v5_20261002/outdoor_nine_frames/ground_surface_run/summary.json",
+      "sha256": "f3affc563a2cbac382a2a4c572181b448d0ef002e98cf2e8c08f7e75b31b1098",
+      "size_bytes": 5804
+    },
+    {
+      "path": "evidence/outdoor_nine_frames/evaluation.json",
+      "original_local_path": "outputs/kth_pipeline2_execution/v5_evidence/outputs/kth_pipeline2_pilot_v5_20261002/outdoor_nine_frames/ground_surface_evaluation/report.json",
+      "sha256": "b702552d231652c26873f71278db01e7c20fe865ccb9d1c224c8e8f979fbb51e",
+      "size_bytes": 22548
+    },
+    {
+      "path": "evidence/semantic_evidence.json",
+      "original_local_path": "outputs/kth_pipeline2_execution/pilot_v5_semantic_evidence.json",
+      "sha256": "7fead2fbd6d6d6dbba3a099249506e78c8297283c93fe64b28c5fe5a2374f2d5",
+      "size_bytes": 1369
+    },
+    {
+      "path": "evidence/contribution_review.json",
+      "original_local_path": ".codex-local/handoffs/pipeline2_result_review.json",
+      "sha256": "beeacdc2b58bad422317d8e0042bfce439bf5b851411231e314cfd7bd495dc2a",
+      "size_bytes": 1978
+    },
+    {
+      "path": "figures/indoor_floor_viewer.jpg",
+      "original_local_path": "outputs/kth_pipeline2_execution/indoor_floor_viewer.jpg",
+      "sha256": "781476f6bf9ef9aa4f0209c7478516eec68e6d6f0a12aec57dfcd7b5b8d3311a",
+      "size_bytes": 199617
+    },
+    {
+      "path": "figures/outdoor_ground_viewer.jpg",
+      "original_local_path": "outputs/kth_pipeline2_execution/outdoor_ground_viewer.jpg",
+      "sha256": "05ac99e6a0e045532c055d7bb7ae5f02f92fd3c9376220f3f1733445edc716c4",
+      "size_bytes": 99091
+    },
+    {
+      "path": "figures/outdoor_ground_evidence.jpg",
+      "original_local_path": "outputs/kth_pipeline2_execution/outdoor_ground_evidence.jpg",
+      "sha256": "d8e91d3f12a1a19b8d7ee21d2d851a62f57e31228f34d4655169444e1a745b50",
+      "size_bytes": 47931
+    }
+  ],
+  "omitted": [
+    "processed RGB frames",
+    "instance masks",
+    "geometry caches",
+    "map NPZs",
+    "interactive HTML",
+    "model weights"
+  ],
+  "limitations": [
+    "Metadata snapshot cannot be replayed as a complete run.",
+    "Checkpoint and cache paths in unchanged original records are historical server paths.",
+    "Independent accuracy references absent; physical planning blocked.",
+    "SAM call timings exclude loading and do not establish live end-to-end throughput."
+  ]
+}

@@ -1,0 +1,6 @@
+[submodule "src/lingbot-map"]
+	path = src/lingbot-map
+	url = https://github.com/Robbyant/lingbot-map.git
+[submodule "src/sam3-robot"]
+	path = src/sam3-robot
+	url = https://github.com/florian-immig/sam3-robot.git

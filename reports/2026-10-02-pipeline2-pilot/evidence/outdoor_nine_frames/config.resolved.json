@@ -1,0 +1,174 @@
+{
+  "config_digest": "c449e810575e7d6f8ab632b06325be87b5abd912651a9ec825b38f03d8e283a6",
+  "contract_id": "semantic_mapping_v1",
+  "evaluation_grid": {
+    "map_frame": "lingbot_world",
+    "origin": [
+      -5,
+      -5,
+      0
+    ],
+    "projection_basis": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ]
+    ],
+    "provenance": "frozen visualization ROI; physical evaluation unavailable until external calibration",
+    "resolution": 0.1,
+    "shape": [
+      100,
+      100
+    ],
+    "units": "reconstruction_units"
+  },
+  "fixture": false,
+  "fusion": {
+    "negative_evidence": true,
+    "origin": [
+      0,
+      0,
+      0
+    ],
+    "semantic_expiry_ns": null,
+    "semantic_threshold": 0.5,
+    "voxel_size": 0.05
+  },
+  "geometry": {
+    "checkpoint": "/home/jovyan/EmbodiedAI-pipelines/.cache/huggingface/hub/models--robbyant--lingbot-map/snapshots/756d3c0b6d431cb95357228e3dc66ed8316772ef/lingbot-map.pt",
+    "checkpoint_sha256": "ee665103348e07e6b826d529b8e61de8f413d5432a4f2e84970d6c8fd2e1cd72",
+    "device": "cuda:0",
+    "image_size": 518,
+    "keyframe_interval": 1,
+    "map_frame": "lingbot_world",
+    "min_confidence": 1.5,
+    "pose_revision": "initial",
+    "scale": {},
+    "source_revision": "849e690bb086103637e44b1e91878d9d43a8bf0c",
+    "source_root": "/home/jovyan/EmbodiedAI-pipelines/vendor/lingbot-map",
+    "up": {}
+  },
+  "geometry_identity": {
+    "geometry_fingerprint": "cbe7d75c5fedd46313e11d8c63ee4d4f7a3dde184ea4bc8ec86ed836ee9e06e8",
+    "input_fingerprint": "4804b500f3e5948c84a70ea58534a2810cdebdefd0c61ffdee2365ccf39f3a93",
+    "pose_revision": "initial",
+    "processed_grid_id": "d4451ac1d854a2fef032eafadf2f95970736205e1482e08c927c579e2fcbdcdc",
+    "scale": {},
+    "units": "reconstruction_units",
+    "up": null
+  },
+  "goals": [
+    {
+      "frame": "lingbot_world",
+      "goal": [
+        1,
+        0,
+        0
+      ],
+      "request_id": "requested_local_plan",
+      "start": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "hardware_budget": {
+    "device": "cuda:0",
+    "max_visible_gpus": 1,
+    "measured": false
+  },
+  "mode": "quality_replay",
+  "pipeline": {
+    "config_id": "ground_surface_outdoor_v1",
+    "fixture": false,
+    "pipeline_id": "ground_surface",
+    "prompt": "ground",
+    "prompt_selection": {
+      "basis": "starting_proposal_unmeasured",
+      "environment": "outdoor",
+      "frozen": true,
+      "selection_split": "development"
+    },
+    "sam3": {
+      "allow_downloads": false,
+      "cache_root": "/home/jovyan/EmbodiedAI/.cache/kth/huggingface/hub/models--facebook--sam3/blobs",
+      "checkpoint_path": "9999e2341ceef5e136daa386eecb55cb414446a00ac2b55eb2dfd2f7c3cf8c9e",
+      "checkpoint_revision": "3c879f39826c281e95690f02c7821c4de09afae7",
+      "checkpoint_sha256": "9999e2341ceef5e136daa386eecb55cb414446a00ac2b55eb2dfd2f7c3cf8c9e",
+      "checkpoint_size_bytes": 3450062241,
+      "code_revision": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+      "confidence_threshold": 0.5,
+      "device": "cuda:0",
+      "enable_model_loading": true,
+      "fixture": false,
+      "local_files_only": true,
+      "mask_probability_threshold": 0.5,
+      "model_key": "sam3_image",
+      "resolution": 1008
+    }
+  },
+  "pipeline_config": {
+    "config_id": "ground_surface_outdoor_v1",
+    "fixture": false,
+    "pipeline_id": "ground_surface",
+    "prompt": "ground",
+    "prompt_selection": {
+      "basis": "starting_proposal_unmeasured",
+      "environment": "outdoor",
+      "frozen": true,
+      "selection_split": "development"
+    },
+    "sam3": {
+      "allow_downloads": false,
+      "cache_root": "/home/jovyan/EmbodiedAI/.cache/kth/huggingface/hub/models--facebook--sam3/blobs",
+      "checkpoint_path": "9999e2341ceef5e136daa386eecb55cb414446a00ac2b55eb2dfd2f7c3cf8c9e",
+      "checkpoint_revision": "3c879f39826c281e95690f02c7821c4de09afae7",
+      "checkpoint_sha256": "9999e2341ceef5e136daa386eecb55cb414446a00ac2b55eb2dfd2f7c3cf8c9e",
+      "checkpoint_size_bytes": 3450062241,
+      "code_revision": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+      "confidence_threshold": 0.5,
+      "device": "cuda:0",
+      "enable_model_loading": true,
+      "fixture": false,
+      "local_files_only": true,
+      "mask_probability_threshold": 0.5,
+      "model_key": "sam3_image",
+      "resolution": 1008
+    }
+  },
+  "pipeline_id": "ground_surface",
+  "planning": {},
+  "protocol_id": "semantic_mapping_eval_v1",
+  "robot": null,
+  "runtime": {
+    "cadence_frames": 1,
+    "expiry_ns": null,
+    "pending_capacity": 1,
+    "playback_rate": 1.0
+  },
+  "schema_version": 1,
+  "semantic_keyframe_ids": [
+    "frame_000000",
+    "frame_000001",
+    "frame_000002",
+    "frame_000003",
+    "frame_000004",
+    "frame_000005",
+    "frame_000006",
+    "frame_000007",
+    "frame_000008"
+  ],
+  "sequence": {
+    "frame_count": 9,
+    "manifest_digest": "c74aba06ae36a74efc528851cbe7158b1a3ef927ee25cbeee6a1782fa0035110",
+    "sequence_id": "outdoor_nine_frames",
+    "split": "development"
+  }
+}

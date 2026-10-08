@@ -344,6 +344,70 @@ class Sam3AdapterTests(unittest.TestCase):
         self.assertFalse(segmenter.metadata["fixture"])
         segmenter.close()
 
+    def test_real_processor_operations_scope_bf16_to_indexed_device_and_restore_after_error(self):
+        active, entered, operations = [], [], []
+        bf16 = object()
+        expected = [("device", 1), "inference", ("autocast", "cuda", bf16)]
+        class Context:
+            def __init__(self, label):
+                self.label = label
+            def __enter__(self):
+                entered.append(self.label)
+                active.append(self.label)
+            def __exit__(self, *args):
+                self_label = active.pop()
+                if self_label != self.label:
+                    raise AssertionError("Context restoration order changed")
+        testcase = self
+        class GuardedProcessor(MockProcessor):
+            def set_image(self, image):
+                testcase.assertEqual(active, expected)
+                operations.append("image")
+                return super().set_image(image)
+            def reset_all_prompts(self, state):
+                testcase.assertEqual(active, expected)
+                operations.append("reset")
+                return super().reset_all_prompts(state)
+            def set_text_prompt(self, **kwargs):
+                testcase.assertEqual(active, expected)
+                operations.append("prompt")
+                return super().set_text_prompt(**kwargs)
+        torch = SimpleNamespace(
+            cuda=SimpleNamespace(device=lambda index: Context(("device", index))),
+            bfloat16=bf16, inference_mode=lambda: Context("inference"),
+            autocast=lambda device_type, dtype: Context(("autocast", device_type, dtype)),
+        )
+        processor = GuardedProcessor()
+        segmenter = adapter.Sam3Segmenter({"device": "cuda:1"}, processor=processor,
+                                         model=object(), _load_token=adapter._LOAD_TOKEN)
+        real_import = importlib.import_module
+        with patch.object(adapter.importlib, "import_module", side_effect=lambda name: torch if name == "torch" else real_import(name)):
+            result = segmenter.segment_image({**self.frame, "fixture": False}, ["boom", "cup"], self.root)
+        self.assertEqual(active, [])
+        self.assertEqual(entered, expected * 3)
+        self.assertEqual(operations, ["image", "reset", "prompt", "reset", "prompt"])
+        self.assertEqual([query["status"] for query in result["queries"]], ["error", "ok"])
+        self.assertEqual(result["frame"]["sam_query_count"], 2)
+        self.assertEqual(segmenter.metadata["inference_context"]["autocast_dtype"], "torch.bfloat16")
+        self.assertEqual(segmenter.metadata["inference_context"]["device"], "cuda:1")
+
+    def test_bfloat16_cpu_capture_promotes_before_numpy_and_keeps_an_independent_copy(self):
+        values = np.array([0.5, 0.75], dtype=np.float32)
+        log = []
+        class BFloat16Tensor(MockTensor):
+            dtype = "torch.bfloat16"
+            def numpy(self):
+                raise TypeError("NumPy does not support BFloat16")
+            def float(self):
+                self.log.append("float")
+                return MockTensor(self.values, self.log)
+        captured = adapter._cpu_array(BFloat16Tensor(values, log), np)
+        self.assertEqual(log, ["detach", "cpu", "float"])
+        self.assertEqual(captured.dtype, np.float32)
+        np.testing.assert_array_equal(captured, values)
+        values.fill(0)
+        np.testing.assert_array_equal(captured, [0.5, 0.75])
+
 
 if __name__ == "__main__":
     unittest.main()

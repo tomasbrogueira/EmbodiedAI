@@ -1,0 +1,34 @@
+{
+  "contract_id": "semantic_mapping_v1",
+  "schema_version": 1,
+  "pipeline_id": "fixed_hazards",
+  "mode": "quality_replay",
+  "pipeline": {
+    "pipeline_id": "fixed_hazards",
+    "config_id": "fixed_hazards_sam3_v1",
+    "policy_path": "VLM_evaluation/configs/hazards/policy.json",
+    "policy_file_sha256": "ff5f3e39a7b2dfd9ec122716b9e166f5aba8bc9df6dbf545b6fe84f698a19ed3",
+    "policy_hash": "89b2c1bf51940c579b6c0a6e7c645c82fe3501c424900ce23475a45b60c3e216",
+    "alias_hash": "208ad2e568186aea3c4e1d3d5d1bb3b69547eae570963ce36cce901c4f9cd50f",
+    "enable_model_loading": false,
+    "sam_settings": {
+      "model_key": "sam3_image",
+      "code_repository": "https://github.com/facebookresearch/sam3",
+      "code_revision": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+      "checkpoint_repository": "facebook/sam3",
+      "checkpoint_revision": "3c879f39826c281e95690f02c7821c4de09afae7",
+      "checkpoint_filename": "sam3.pt",
+      "checkpoint_sha256": "9999e2341ceef5e136daa386eecb55cb414446a00ac2b55eb2dfd2f7c3cf8c9e",
+      "checkpoint_size_bytes": 3450062241,
+      "device": "cuda:0",
+      "resolution": 1008,
+      "confidence_threshold": 0.5,
+      "mask_probability_threshold": 0.5,
+      "allow_downloads": false,
+      "local_files_only": true,
+      "cache_root": null,
+      "checkpoint_path": null,
+      "code_source_root": null
+    }
+  }
+}

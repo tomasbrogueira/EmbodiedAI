@@ -1,0 +1,18 @@
+# Keep Python source hashes stable across Linux and Windows checkouts.
+*.py text eol=lf
+*.sh text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Policies/configs can bind the encoded JSON bytes, including existing CRLF.
+# Preserve those bytes on every platform without disabling readable diffs.
+*.json -text
+
+# Historical evidence is copied byte-for-byte and bound by SHA256 manifests.
+reports/** -text
+
+*.mp4 binary
+*.jpg binary
+*.png binary
+*.npz binary
+*.pdf binary

@@ -1,178 +1,140 @@
-# Lingbot-Map + SAM 3D Path Mapping
+# EmbodiedAI: four comparable mapping pipelines
 
-This project grounds a 2D SAM 3 segmentation in a 3D reconstruction. Given an
-ordered image sequence or video, Lingbot-Map reconstructs the scene and SAM 3
-segments pixels matching the text prompt `Path`. The positive pixels are then
-assigned to the corresponding 3D points and accumulated into labelled voxels.
+This repository compares pretrained LingBot-Map reconstruction with three
+semantic alternatives on the same 18 project videos. All four use the shared
+RGB/geometry handoff, semantic voxel fusion, robot policy, planner and evaluator.
 
-```text
-frames/video
-    -> Lingbot-Map: depth, poses, intrinsics, world points
-    -> SAM 3: prompt "Path" and per-pixel mask
-    -> mask pixels + 3D points
-    -> voxel aggregation
-    -> visual 3D path map
-```
+| Pipeline ID | Meeting assignment, 8 October 2026 | Semantic evidence |
+| --- | --- | --- |
+| geometry_only | João | LingBot geometry only |
+| ground_surface | Tomás | SAM3 with the exact lowercase prompt **floor** |
+| fixed_hazards | Florian | SAM3 with a larger fixed vocabulary; concepts keep explicit surface/hazard roles |
+| qwen_hazards | Joris, tentative | A small VLM proposes words, then SAM3 segments them |
 
-## Components
+The common runner and all four adapters are implemented. CPU fixtures exercise
+their shared artifact contract. **Real video results, accuracy and runtime still
+need pipeline-specific validation.** The meeting reported a LingBot-Map problem;
+João will address it using his working setup. Its precise cause is not established
+here. Keep that blocker distinct from historical pilots and component results.
 
-- [`src/lingbot-map/`](src/lingbot-map/) provides streaming 3D reconstruction.
-- [`src/sam3-robot/`](src/sam3-robot/) provides the SAM 3 text-prompt wrapper.
-- `data/videos/` contains experiment inputs.
+~~~text
+recording -> prepared sequence -> shared LingBot geometry and processed RGB
+                                      |
+                              one semantic adapter
+                                      |
+                          geometry + per-concept voxels
+                                      |
+                         robot policy and local planning
+                                      |
+                         evaluation -> comparison report
+~~~
 
-This pipeline should use an image sequence or video. A single image can produce
-a single-view depth estimate, but cannot provide a stable scene-level map.
+A surface mask is candidate evidence. Geometry, scale, up direction and robot
+limits are separate requirements for physical traversability claims.
 
-## Setup
+## Start with a CPU fixture
 
-Both components currently require an NVIDIA GPU. Follow the component setup
-instructions in [`src/lingbot-map/README.md`](src/lingbot-map/README.md) and
-[`src/sam3-robot/README.md`](src/sam3-robot/README.md).
+Use Python 3.12 from the repository root. This needs no GPU, checkpoints,
+network access during execution, or initialized model submodules.
 
-Run Lingbot-Map on ordered frames with:
+Follow the [external CPU setup](docs/local_setup.md#choose-external-storage-and-check-the-cpu-path)
+for the exact PowerShell or Linux/macOS commands. It creates a separate
+environment, redirects package and temporary caches outside the checkout,
+generates a fixture there and runs the repository tests.
 
-```bash
-cd src/lingbot-map
-python demo.py \
-  --model_path /path/to/lingbot-map.pt \
-  --image_folder /path/to/frames \
-  --export_preprocessed /path/to/processed_frames
-```
+Choose a fresh fixture directory for each invocation. The fixture creates three
+analytic images, a geometry cache and independent synthetic robot references,
+then calls the real run/evaluate/compare CLIs for all four IDs. Inspect
+`<asset-directory>/runs/cpu-fixture-001/comparison/comparison.json` and its metrics table.
+The common fixture adapters replace model inference; production adapter checks
+also live in [tests/pipelines](tests/pipelines/). Fixture timings are CPU software
+checks, never model performance results.
 
-Configure SAM 3 with the exact prompt `Path`. The current SAM vocabulary does
-not include this concept by default, so add it to
-`src/sam3-robot/sam3_terrain/concepts.py` or use a project-specific config.
+The repository test suite covers the shared mapping system.
+[VLM_evaluation](VLM_evaluation/README.md) has its own setup and tests.
+See [dependency scopes](requirements/README.md) for installation limitations.
 
-## Fusion Pipeline
+## Run a recording
 
-### 1. Keep both models pixel-aligned
+Prepare each recording once and share its frozen sequence manifest. The current
+preparation CLI accepts a video or an ordered frame folder and a JSON config.
+Video decoding additionally needs OpenCV. Use a complete copied run config with
+local checkpoint paths and the settings described in
+[pipeline configuration](docs/pipeline_configuration.md). A minimal preparation
+config is shown in the [repository guide](docs/repository_guide.md#prepare-a-shared-sequence).
 
-Run SAM 3 on the same cropped/resized frames used by Lingbot-Map. The simplest
-approach is to use Lingbot-Map's `--export_preprocessed` output. If SAM runs on
-the original frames, resize the masks back with nearest-neighbour interpolation
-and apply the same transform to the camera intrinsics.
+~~~bash
+python src/prepare_sequence.py --input data/videos/indoor/IMG_5506.mp4 --config /path/to/prepare.json --output data/prepared/IMG_5506
+python src/run_pipeline.py --pipeline ground_surface --sequence data/prepared/IMG_5506/sequence.json --config /path/to/run.json --output runs/ground_surface/IMG_5506/attempt-001
+python src/evaluate_pipeline.py --run runs/ground_surface/IMG_5506/attempt-001 --output results/ground_surface/IMG_5506/attempt-001
+~~~
 
-For a crop `(left, top)` followed by scale `(sx, sy)`:
+The configuration guide defines the preparation fields and presets. Run commands
+from the repository root; replace the two config paths with real JSON files.
+For matched quality replays, later runs use the first run's geometry cache via
+**--geometry-cache**. [Run storage](docs/run_storage.md) explains the actual
+layout, optional **--output-root** for unique attempts, and cache portability.
 
-```text
-K_processed = [[sx * fx,       0, sx * (cx - left)],
-               [      0, sy * fy, sy * (cy - top)],
-               [      0,        0,              1]]
-```
+Without independent references, evaluation still reports supported operational
+diagnostics and explicit unavailable quality metrics. When references exist,
+add **--reference /path/to/reference.json**. Compare at least two evaluation
+directories, repeating **--evaluation**:
 
-### 2. Segment each frame
+~~~bash
+python src/compare_pipelines.py --evaluation results/geometry_only/IMG_5506/attempt-001 --evaluation results/ground_surface/IMG_5506/attempt-001 --output results/comparisons/IMG_5506-001
+~~~
 
-For each frame, run SAM 3 with `Path` and merge all returned instances into a
-single boolean mask. Keep the SAM confidence for each positive pixel. Reject
-low-confidence or invalid Lingbot points.
+Comparison checks the frozen experiment identities and reports incompatibilities.
+It cannot repair different sequences, calibration, robot policies or hardware
+budgets. Raw maps remain useful when calibrated planning is unavailable.
 
-Lingbot-Map provides the data needed for fusion:
+## Model setup and access
 
-```text
-world_points       [S, H, W, 3]  world point for each processed pixel
-world_points_conf  [S, H, W]     point confidence
-depth              [S, H, W, 1] depth in camera coordinates
-extrinsic          [S, 3, 4]    decoded camera pose
-intrinsic           [S, 3, 3]    camera matrix K
-```
+Follow [local setup on a PC or Linux host](docs/local_setup.md) for a `main`
+clone, an external asset directory and explicit pinned model preparation.
+A normal clone includes all 18 project videos and leaves historical model
+submodules uninitialized. CPU fixtures need neither model code nor checkpoints.
+Keep model source checkouts, environments, weights, HF/Torch/pip caches,
+temporary files and bulk runs outside the project checkout.
 
-### 3. Project the mask into 3D
+The guide installs the pinned official SAM3 package from an external clean
+checkout; do not use `sam3-robot/setup.sh`, which clones unpinned upstream code.
+[Dependency scopes](requirements/README.md) describe the proposed GPU stacks;
+their pins are not a newly verified working LingBot setup. Coordinate LingBot
+environment changes with João. Keep model revisions and file hashes in the
+effective config; changing them creates a new experiment.
 
-The preferred method is to use Lingbot-Map's point map directly. For every
-positive pixel `(u, v)` in frame `s`:
+- Obtain LingBot's local checkpoint from [Robbyant/lingbot-map](https://huggingface.co/robbyant/lingbot-map).
+- Obtain SAM3 access and its local checkpoint from [facebook/sam3](https://huggingface.co/facebook/sam3); access approval is separate from cloning the wrapper.
+- Qwen variants use the pinned model identities in
+  [configs/pipelines](configs/pipelines/) and the separate
+  [hazard inference setup](VLM_evaluation/docs/hazard_inference.md).
 
-```text
-p_world = world_points[s, v, u]
-```
+Store weights and caches outside Git. Current semantic adapters require
+explicit local-only model preparation; missing weights or dependencies are
+reported, and model failures never silently switch to fixture predictions.
+The legacy fixed-hazard and Qwen templates need local paths and explicit model
+loading enabled; the newer larger-vocabulary preset already enables loading.
+SAM checkpoint paths are relative inside a cache root, unlike LingBot's path.
+Copy presets to external local configs and override absolute source/cache roots
+as shown in the setup guide. See the configuration guide before running any preset.
 
-If explicit back-projection is needed, use the depth and intrinsics:
+## Where to work and report
 
-```text
-z = depth[s, v, u]
-p_camera = [(u - cx) * z / fx, (v - cy) * z / fy, z, 1]
-p_world = T_camera_to_world[s] @ p_camera
-```
+- [Repository guide](docs/repository_guide.md): source layout, interfaces and extension points.
+- [Team workflow](docs/team_workflow.md): owners, common videos, runtime scopes, report template and Sunday handoff.
+- [Contributing](CONTRIBUTING.md): branches, review and local checks.
+- [Publication readiness](docs/release_readiness.md): prepared changes, verification and remaining research work.
+- [Pipeline status and evidence](docs/pipeline_candidates.md): implemented features and validation limits.
+- [Curated pilot evidence](reports/README.md): compact historical results retained for review.
+- [Historical implementation specifications](docs/implementation/README.md): retained design context.
 
-Make sure the decoded pose is camera-to-world. If it is world-to-camera, invert
-it before projection. The frame index, image dimensions, and coordinate
-convention must be identical across the two models.
+Use the same [18 recordings](data/videos/README.md) for every pipeline.
+Report runtime, advantages, limitations, and concrete good/bad examples.
+The soft deadline is **Sunday 11 October 2026**; the hard deadline will be
+decided at that meeting. Compact reviewed reports can be published later;
+bulk runs, renderings, model files and caches remain outside Git.
 
-### 4. Accumulate voxels
-
-Choose a metric voxel size, for example `0.05` metres. Quantize each valid
-positive point:
-
-```text
-voxel = floor((p_world - map_origin) / voxel_size).astype(int)
-```
-
-Accumulate observations instead of overwriting labels. A useful weighted score
-is:
-
-```text
-path_weight[voxel] += sam_score * lingbot_point_confidence
-total_weight[voxel] += lingbot_point_confidence
-path_probability = path_weight[voxel] / max(total_weight[voxel], epsilon)
-```
-
-Mark a voxel as path when its probability and observation count pass configured
-thresholds. Save voxel coordinates, path probabilities, observation counts, and
-the configuration used to create the map.
-
-## Visualization
-
-The implementation should write an output directory such as `outputs/demo/`:
-
-```text
-overlays/        RGB frames with the SAM Path mask
-path_points.npz  positive 3D points before voxelization
-path_voxels.npz  voxel coordinates, scores, and counts
-path_map.ply     coloured path voxels
-path_map.glb     optional scene with context cloud and camera poses
-summary.json     thresholds and output statistics
-```
-
-Use three views to debug the result:
-
-1. **2D overlays:** confirm that SAM selects the intended path and that masks
-   are aligned with the processed RGB frames.
-2. **3D projected points:** display positive points in green over the Lingbot
-   point cloud. This reveals incorrect pose inversion or frame alignment.
-3. **Voxel map:** display high-confidence path voxels in green, uncertain ones
-   in yellow, and the reconstructed context in gray.
-
-Lingbot-Map already provides an interactive Viser viewer and GLB export. The
-fusion viewer should retain the camera trajectory and add the path points and
-voxels as separate layers. For a quick baseline visualization:
-
-```bash
-cd src/sam3-robot
-python scripts/run_image.py \
-  --images "data/images/*.jpg" \
-  --out ../../outputs/demo/overlays
-```
-
-The final fusion command should generate the overlays and 3D artifacts, then
-serve the interactive map, for example:
-
-```bash
-python src/fuse_path_into_map.py \
-  --frames data/videos/indoor/demo_frames \
-  --lingbot-checkpoint /path/to/lingbot-map.pt \
-  --prompt Path \
-  --voxel-size 0.05 \
-  --output outputs/demo \
-  --serve --port 8080
-```
-
-## Validation
-
-Before accepting a map, verify that:
-
-- the same frame and processed dimensions are used by SAM and Lingbot-Map;
-- positive pixels have valid depth and point confidence;
-- projected points have positive camera depth;
-- reprojecting a selected 3D point returns its source pixel within about one
-  pixel;
-- path labels persist across neighbouring frames;
-- the overlays, projected point cloud, and voxel map agree visually.
+For INESC work, read the local server rules before connecting and follow the
+[server section of the team guide](docs/team_workflow.md#shared-server-work).
+Existing server jobs and results must be preserved.

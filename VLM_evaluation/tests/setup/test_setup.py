@@ -228,6 +228,29 @@ class SetupTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "NumPy"):
                 self.plan(*arguments, "--driver-version", "596.58")
 
+    def test_hazard_tooling_uses_standard_package_source_before_cuda(self):
+        self._hazard_fragments()
+        wheelhouse = self.repository / "wheelhouse"
+        wheelhouse.mkdir()
+        for source_arguments in ((), ("--wheelhouse", str(wheelhouse))):
+            with self.subTest(source_arguments=source_arguments), mock.patch.object(setup.sys, "version_info", (3, 12, 13)):
+                plan = self.plan("--cuda", "--gpu-profile", "hazard", "--torch-index-url", "https://download.pytorch.org/whl/cu126",
+                                 "--driver-version", "535.247.01", *source_arguments)
+            labels = [command["label"] for command in plan["commands"]]
+            self.assertLess(labels.index("base"), labels.index("tooling"))
+            self.assertLess(labels.index("tooling"), labels.index("cuda"))
+            tooling = plan["commands"][labels.index("tooling")]["argv"]
+            self.assertIn("setuptools==80.9.0", tooling)
+            self.assertIn(str(Path(plan["env_dir"]) / setup.CONSTRAINTS_NAME), tooling)
+            self.assertNotIn("--index-url", tooling)
+            self.assertNotIn("--no-index", tooling)
+            if source_arguments:
+                self.assertEqual(tooling[tooling.index("--find-links") + 1], str(wheelhouse))
+            else:
+                self.assertNotIn("--find-links", tooling)
+            cuda = plan["commands"][labels.index("cuda")]["argv"]
+            self.assertEqual(cuda[cuda.index("--index-url") + 1], "https://download.pytorch.org/whl/cu126")
+
     def test_hazard_model_fragments_require_hazard_gpu_and_missing_fragments_fail(self):
         for name in ("hazard_inference", "hazard_segmentation"):
             with self.subTest(name=name), self.assertRaisesRegex(ValueError, "gpu-profile hazard"):
@@ -253,6 +276,16 @@ class SetupTests(unittest.TestCase):
         self.assertIn(str(source), sam3["argv"])
         self.assertNotIn(setup.SAM3_URL, sam3["argv"])
         self.assertEqual(plan["sam3_revision"], setup.SAM3_REVISION)
+        labels = [command["label"] for command in plan["commands"]]
+        self.assertLess(labels.index("tooling"), labels.index("cuda"))
+        tooling = plan["commands"][labels.index("tooling")]["argv"]
+        self.assertIn("setuptools==80.9.0", tooling)
+        for command in plan["commands"]:
+            if command["label"] != "check":
+                self.assertIn("--no-index", command["argv"])
+                self.assertIn("--only-binary=:all:", command["argv"])
+                self.assertEqual(command["argv"][command["argv"].index("--find-links") + 1], str(wheelhouse))
+                self.assertNotIn("--index-url", command["argv"])
 
     def test_local_sam3_wrong_revision_blocks_before_environment_writes(self):
         plan = self.plan()

@@ -1,0 +1,5 @@
+# CPU contract tests; model packages and checkpoints are not needed.
+-r path_mapping_cpu.txt
+pytest>=8.3,<10
+# CPU geometry corrections and saved-video export tests.
+opencv-python-headless==4.11.0.86

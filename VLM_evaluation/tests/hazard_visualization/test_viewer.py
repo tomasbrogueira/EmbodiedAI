@@ -280,6 +280,55 @@ def test_rejected_profile_without_component_stays_visible(saved_fixture):
     plt.close(fig)
 
 
+def test_eight_missing_native_profiles_keep_distinct_expected_identities(saved_fixture):
+    config, report, path = saved_fixture
+    conditions = ["vlm__qwen3_vl_4b", "vlm__qwen3_5_4b"]
+    planned = [(condition, "kth_v1_vlm") for condition in conditions]
+    planned += [(condition, "kth_v1_sam") for condition in conditions + ["reference_present", "fixed_policy"]]
+    planned += [(condition, "kth_v1_combined") for condition in conditions]
+    rows = [{"summary_path": f"benchmark/{condition}/{profile}/summary.json",
+             "valid": False, "complete": False, "comparison_ready": False,
+             "error": "missing profile metadata"} for condition, profile in planned]
+    report["deployment"]["rows"] = rows
+    write_json(path, report)
+    saved = load_run(config)
+    assert set(saved.profiles) == {("unavailable", "expected:" + condition, profile)
+                                   for condition, profile in planned}
+    assert list(saved.profiles.values()) == rows
+    assert all("component" not in row and "condition_key" not in row for row in saved.profiles.values())
+    figure = render_deployment(saved, list(saved.profiles))
+    assert len(figure._hazard_export["selected_rows"]) == 8
+    assert all(row["valid"] is False and row["comparison_ready"] is False
+               for row in figure._hazard_export["selected_rows"])
+    assert saved.status()["comparison"]["model_selection_ready"] is False
+    plt.close(figure)
+    report["deployment"]["rows"].append(copy.deepcopy(rows[0]))
+    write_json(path, report)
+    with pytest.raises(ArtifactError, match="duplicate deployment profile identity"):
+        load_run(config)
+
+
+@pytest.mark.parametrize("summary_path", ["../benchmark/c/p/summary.json",
+                                         "benchmark/c/../p/summary.json",
+                                         "benchmark\\c\\p\\summary.json"])
+def test_expected_profile_identity_requires_safe_summary_path(saved_fixture, summary_path):
+    config, report, path = saved_fixture
+    report["deployment"]["rows"] = [{"summary_path": summary_path, "valid": False}]
+    write_json(path, report)
+    with pytest.raises(ArtifactError):
+        load_run(config)
+
+
+def test_expected_profile_path_does_not_replace_observed_identity(saved_fixture):
+    config, report, path = saved_fixture
+    row = report["deployment"]["rows"][0]
+    row["summary_path"] = "benchmark/expected_condition/explicit_profile/summary.json"
+    write_json(path, report)
+    saved = load_run(config)
+    assert next(iter(saved.profiles)) == ("combined", CONDITION, "explicit_profile")
+    assert next(iter(saved.profiles.values())) == row
+
+
 @pytest.mark.parametrize("outcome", ["ok_empty", "error", "missing"])
 def test_response_failure_and_empty_distinction(saved_fixture, outcome):
     config, report, path = saved_fixture

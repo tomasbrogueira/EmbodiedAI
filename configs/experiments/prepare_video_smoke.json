@@ -1,0 +1,5 @@
+{
+  "contract_id": "semantic_mapping_v1", "schema_version": 1,
+  "sequence_id": "kth_video_smoke_v1", "split": "development", "fixture": false,
+  "stride": 1, "max_frames": 8, "sample_fps": 2.0
+}

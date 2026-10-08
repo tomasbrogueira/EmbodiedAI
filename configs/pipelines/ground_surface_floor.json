@@ -1,0 +1,88 @@
+{
+  "contract_id": "semantic_mapping_v1",
+  "schema_version": 1,
+  "fixture": false,
+  "mode": "quality_replay",
+  "geometry": {
+    "checkpoint": "models/lingbot-map.pt",
+    "source_root": "src/lingbot-map",
+    "image_size": 518,
+    "device": "cuda:0",
+    "map_frame": "lingbot_world",
+    "scale": {},
+    "up": {}
+  },
+  "robot": null,
+  "planning": {},
+  "goals": [
+    {
+      "request_id": "requested_local_plan",
+      "start": [
+        0,
+        0,
+        0
+      ],
+      "goal": [
+        1,
+        0,
+        0
+      ],
+      "frame": "lingbot_world"
+    }
+  ],
+  "evaluation_grid": {
+    "shape": [
+      100,
+      100
+    ],
+    "origin": [
+      -5,
+      -5,
+      0
+    ],
+    "resolution": 0.1,
+    "projection_basis": [
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        1,
+        0
+      ]
+    ],
+    "map_frame": "lingbot_world",
+    "units": "reconstruction_units",
+    "provenance": "frozen visualization ROI; physical evaluation unavailable until external calibration"
+  },
+  "pipeline_id": "ground_surface",
+  "pipeline": {
+    "pipeline_id": "ground_surface",
+    "config_id": "ground_surface_indoor_v1",
+    "prompt": "floor",
+    "prompt_selection": {
+      "frozen": true,
+      "selection_split": "development",
+      "basis": "meeting_exact_floor_baseline_unmeasured",
+      "environment": "mixed"
+    },
+    "sam3": {
+      "model_key": "sam3_image",
+      "code_revision": "2345a4ad109ac29c569da749c91d84f10dc08c40",
+      "checkpoint_revision": "3c879f39826c281e95690f02c7821c4de09afae7",
+      "checkpoint_sha256": "9999e2341ceef5e136daa386eecb55cb414446a00ac2b55eb2dfd2f7c3cf8c9e",
+      "checkpoint_size_bytes": 3450062241,
+      "device": "cuda:0",
+      "resolution": 1008,
+      "confidence_threshold": 0.5,
+      "mask_probability_threshold": 0.5,
+      "enable_model_loading": true,
+      "allow_downloads": false,
+      "local_files_only": true,
+      "cache_root": "../.cache",
+      "checkpoint_path": "models/sam3.pt"
+    }
+  }
+}

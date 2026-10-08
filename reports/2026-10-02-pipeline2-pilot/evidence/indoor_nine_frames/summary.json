@@ -1,0 +1,160 @@
+{
+  "contract_id": "semantic_mapping_v1",
+  "counts": {
+    "failed_frames": 0,
+    "frames": 9,
+    "queue_drops": 0,
+    "semantic_rows": 2980,
+    "successful_frames": 9,
+    "voxels": 2980
+  },
+  "eligible_replay_duration_s": null,
+  "fixture": false,
+  "geometry_diagnostics": {
+    "alignment": {
+      "behind_camera_count": 0,
+      "coverage": "all_valid_geometry_pixels",
+      "max_error_pixels": 0.0001856311807341986,
+      "median_error_pixels": 2.7179103300577482e-05,
+      "median_sample_count": 1152,
+      "pose_convention": "world_to_camera",
+      "sample_count": 2413717,
+      "validated_point_count": 2413717
+    },
+    "processed_pixels": 2414916,
+    "valid_surface_pixels": 2413717
+  },
+  "limitations": [
+    "2.5D static planning is an internal diagnostic",
+    "surface-only mapping emits no free-space evidence",
+    "batch LingBot reconstruction means paced scheduling is staged; live end-to-end speed and joint model memory remain unavailable"
+  ],
+  "measurement_scope": "staged_quality_replay",
+  "models_executed": true,
+  "operational_metrics": {
+    "host_rss_peak_bytes": {
+      "clock": "monotonic_ns",
+      "collection_duration_s": 23.355062291,
+      "collection_scope": "actual current-process sampled RSS peak across the staged runner",
+      "collection_start_monotonic_ns": 2543683327091793,
+      "collection_stop_monotonic_ns": 2543706682154084,
+      "first_sample_monotonic_ns": 2543683336752471,
+      "last_sample_monotonic_ns": 2543706682151961,
+      "measurement_source": "optional psutil.Process.memory_info().rss",
+      "process_id": 27272,
+      "reason": null,
+      "sample_count": 395,
+      "sample_interval_s": 0.05,
+      "sampled_peak_limitation": "may miss bursts shorter than sample interval; excludes child processes",
+      "status": "available",
+      "unit": "bytes",
+      "value": 8001118208
+    },
+    "joint_gpu_allocated_peak_bytes": {
+      "allocator_peak_start_monotonic_ns": null,
+      "clock": "monotonic_ns",
+      "collection_duration_s": 23.355062291,
+      "collection_scope": "actual joint process peak for staged runner geometry and semantic residency; does not establish simultaneous LingBot and semantic model fit",
+      "collection_start_monotonic_ns": 2543683327091793,
+      "collection_stop_monotonic_ns": 2543706682154084,
+      "collector_peak_reset_count": 0,
+      "device": "cuda:0",
+      "excludes": "GPU driver, other processes and non-Torch GPU allocations",
+      "measurement_source": "PyTorch current-process CUDA caching allocator",
+      "peak_baseline": "CUDA initialized after collector start",
+      "peak_read_monotonic_ns": 2543706682339143,
+      "process_id": 27272,
+      "reason": null,
+      "status": "available",
+      "unit": "bytes",
+      "value": 4737630208
+    },
+    "joint_gpu_reserved_peak_bytes": {
+      "allocator_peak_start_monotonic_ns": null,
+      "clock": "monotonic_ns",
+      "collection_duration_s": 23.355062291,
+      "collection_scope": "actual joint process peak for staged runner geometry and semantic residency; does not establish simultaneous LingBot and semantic model fit",
+      "collection_start_monotonic_ns": 2543683327091793,
+      "collection_stop_monotonic_ns": 2543706682154084,
+      "collector_peak_reset_count": 0,
+      "device": "cuda:0",
+      "excludes": "GPU driver, other processes and non-Torch GPU allocations",
+      "measurement_source": "PyTorch current-process CUDA caching allocator",
+      "peak_baseline": "CUDA initialized after collector start",
+      "peak_read_monotonic_ns": 2543706682413607,
+      "process_id": 27272,
+      "reason": null,
+      "status": "available",
+      "unit": "bytes",
+      "value": 5077204992
+    }
+  },
+  "planning": {
+    "availability": "blocked_inputs",
+    "clearance_certified": false,
+    "decision_codes": {
+      "blocked": 1,
+      "traversable": 2,
+      "unknown": 0
+    },
+    "limitations": [
+      "Static 2.5D grid and circular footprint; no dynamics or robot controller.",
+      "Surface-only geometry: unobserved space is unknown, never observed free space.",
+      "Height clearance checks observed shells only; unseen overhangs are not certified clear.",
+      "Lower support must connect to a declared support-height anchor; multiple floors are not resolved.",
+      "Grid support/plane sampling and raster footprint conservatism limit spatial resolution.",
+      "Multiple observed heights at the same horizontal sample conservatively form separate shells, including reconstruction noise."
+    ],
+    "projection_basis": [],
+    "reason": "metric scale unavailable: geometry units are not metres",
+    "schema_version": 1,
+    "shape": [
+      0,
+      0
+    ],
+    "visibility_model": "none"
+  },
+  "required_frame_attempts": 9,
+  "run_duration_s": 22.8766305,
+  "schema_version": 1,
+  "timing_metadata": {
+    "semantic_call_ms": {
+      "clock": "monotonic_ns",
+      "gpu_work": true,
+      "scope": "staged_replay",
+      "synchronized": true,
+      "timing_boundaries": "audited model calls excluding loading; fixture software calls explicitly synthetic"
+    },
+    "semantic_evidence_age_ms": {
+      "clock": "mapped_capture_monotonic_ns",
+      "scope": "cached_geometry_scheduler_replay",
+      "timing_boundaries": "mapped replay availability to semantic fusion"
+    }
+  },
+  "timing_samples": {
+    "geometry_stage_ms": [],
+    "semantic_call_ms": [
+      459.798905,
+      149.752474,
+      150.99404,
+      150.299765,
+      150.824496,
+      149.785096,
+      151.212296,
+      150.295752,
+      150.277293
+    ],
+    "semantic_evidence_age_ms": [],
+    "semantic_observe_attempt_ms": [
+      12306.230833,
+      158.940453,
+      160.273656,
+      159.910546,
+      159.968569,
+      159.150266,
+      160.483048,
+      159.428856,
+      159.409733
+    ]
+  }
+}

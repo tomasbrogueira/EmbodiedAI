@@ -1,0 +1,82 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{times}
+
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=blue, citecolor=blue}
+
+% ---- Title information ----
+\title{\vspace{-1.5cm}\textbf{Project Proposal: Semantic Voxel-Based Traversability Planning from Monocular Video}}
+\author{João Guilherme \and Joris Köster \and Tomás Brogueira \and Florian Jerome Immig}
+\date{DD2600 -- HT26 \quad \today}
+
+\begin{document}
+
+\maketitle
+\vspace{-0.8cm}
+
+\maketitle
+
+\section{Idea description}
+
+We propose a camera-only system that builds a temporally consistent 3D traversability map from monocular video. Our question is: \emph{does combining online 3D geometry with VLM-based semantic reasoning produce safer and more stable paths than either cue alone?}
+
+LingBot-Map will estimate camera poses, depth, and point clouds from the video stream. Its Geometric Context Transformer maintains local and long-term context for efficient streaming reconstruction \cite{chen_geometric_nodate}. This gives observations from different frames a shared 3D coordinate system. FOUND-IT further demonstrates that monocular foundation-model geometry can support traversable 3D ``places'' \cite{maggio_found-it_2026}.
+
+For semantic reasoning, SAM2 will segment selected frames and each segment will receive a numeric label. A VLM will see the original and labelled images and return the regions that are safe or unsafe for the specified robot. This follows the visual-prompt approach of Nasser et al. and ZeST \cite{nasser_visual_2026,gummadi_zest_2025}. SAM2 tracking will propagate masks between VLM queries.
+
+The masks will be back-projected into 3D using LingBot-Map's depth and camera pose, then fused into voxels across frames. Each voxel stores occupancy, semantic votes, confidence, and observation count. Unobserved or unreliable voxels remain \emph{unknown}, not safe. This 3D fusion also provides correspondence when segment shapes or identifiers change between frames.
+
+For each voxel $v$, we fit a local surface normal $n_v$ and define steepness as
+\[
+    \theta(v)=\arccos\!\left(\lvert n_v^\top g\rvert\right),
+\]
+where $g$ is the up direction estimated from an initial confirmed ground plane. The slope limit is robot-specific. A voxel is traversable only if its semantic score is high, its slope and roughness are below their limits, and it has enough reliable observations. This addresses the semantic--geometric mismatch highlighted by ViTA \cite{hwang_general_2026}.
+
+Temporal fusion should reduce the unstable single-frame decisions identified by GeNIE \cite{wang_genie_2025}. We will compare semantic-only, geometry-only, no-temporal-fusion, and full-system variants. Metrics include semantic precision/IoU, slope error, false-traversable rate, voxel label changes, path validity and path jitter. Evaluation will use short indoor and outdoor videos with flat terrain, slopes, clutter, and unsafe objects.
+
+\section{Group and division of work}
+
+\begin{itemize}
+    \item \textbf{[João Guilherme]:} LingBot-Map integration and geometry evaluation.
+    \item \textbf{[Florian, Joris]:} SAM2, VLM prompting, and semantic evaluation.
+    \item \textbf{[Tomás Brogueira]:} voxel fusion, slope estimation, and confidence handling.
+    \item \textbf{[All]:} experiments, and presentation.
+\end{itemize}
+
+Integration, data collection, and report writing will be shared.
+
+\section{Target grade}
+
+We aim for grade \textbf{A} through an integrated pipeline, cross-frame fusion, temporal-consistency evaluation, and module-level ablations.
+
+\section{Risk assessment and mitigations}
+
+\begin{itemize}
+    \item \textbf{LingBot-Map setup or performance:} test it first; fall back to offline, reduced-rate processing or VGGT/Depth Anything with an external pose estimate.
+    \item \textbf{Monocular drift or incorrect up direction:} use short sequences, initialize from a confirmed ground patch, and reject low-confidence geometry.
+    \item \textbf{VLM latency and inconsistency:} use constrained outputs, cached keyframes, and SAM2 tracking between queries.
+    \item \textbf{Sparse or changing observations:} require repeated evidence, fuse by 3D position, and keep unobserved space unknown.
+    \item \textbf{Integration takes too long:} prioritize offline video reconstruction, semantic voxel fusion, and A* planning; real-time operation is a stretch goal.
+\end{itemize}
+
+\section{Approximate time plan}
+
+\begin{description}[style=nextline]
+    \item[23--28 September] Test LingBot-Map and SAM2/VLM; define interfaces and collect initial videos.
+    \item[29 September--5 October] Implement semantic back-projection, voxel fusion, and slope estimation.
+    \item[6--12 October] Integrate the cost map and planner; collect final evaluation data.
+    \item[13--17 October] Run ablations, prepare plots/video, and complete the report.
+    \item[18 October] Rehearse and finalize slides.
+    \item[19 October 2026] Project presentation.
+\end{description}
+
+\bibliographystyle{plain}
+\bibliography{references}
+\end{document}

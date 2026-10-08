@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import contextmanager
 import hashlib
 import importlib
 import importlib.metadata
@@ -224,6 +225,12 @@ def _image_modules():
 
 
 def _validate_input(frame: dict, prompts: list[str], data_root):
+    if frame.get("input_contract_id") is not None:
+        from pipeline_common.input_bridge import validate_model_input
+        path = validate_model_input(frame, data_root)
+        if not isinstance(prompts, list) or len(prompts) > 32 or any(not isinstance(p, str) or not p.strip() or len(p) > 80 for p in prompts):
+            raise ValueError("prompts must contain at most 32 nonempty strings, each at most 80 characters")
+        return path
     try:
         common = importlib.import_module(f"{__package__}.common")
     except ModuleNotFoundError as error:
@@ -254,6 +261,10 @@ def _cpu_array(value, np):
         value = value.detach()
     if hasattr(value, "cpu"):
         value = value.cpu()
+    # NumPy cannot represent Torch BF16. Preserve its values in float32 before
+    # capturing autocast probabilities/scores; boolean masks remain boolean.
+    if str(getattr(value, "dtype", "")) == "torch.bfloat16":
+        value = value.float()
     if hasattr(value, "numpy"):
         value = value.numpy()
     return np.array(value, copy=True)
@@ -328,6 +339,24 @@ class Sam3Segmenter:
         self.metadata = dict(self.settings)
         self.metadata["software"] = _software()
         self.metadata["model_validation"] = "mocked_api_only" if self.settings["fixture"] else "real_load_only_not_gpu_profiled"
+        if not self.settings["fixture"]:
+            self.metadata["inference_context"] = {
+                "device": self.settings["device"], "inference_mode": True,
+                "autocast_device_type": "cuda", "autocast_dtype": "torch.bfloat16",
+                "bfloat16_output_capture": "float32_before_numpy",
+            }
+
+    @contextmanager
+    def _processor_context(self):
+        if self.settings["fixture"]:
+            yield
+            return
+        torch = importlib.import_module("torch")
+        # The pinned official image example uses BF16 autocast for fused layers.
+        # Scope it to this adapter call while selecting its explicit CUDA index.
+        with torch.cuda.device(int(self.settings["device"].split(":")[1])), \
+             torch.inference_mode(), torch.autocast("cuda", dtype=torch.bfloat16):
+            yield
 
     def close(self) -> None:
         """Release only this adapter's references; never clear global CUDA caches."""
@@ -348,17 +377,23 @@ class Sam3Segmenter:
                 raise ValueError("segmenter_closed")
             path = _validate_input(frame, prompts, data_root)
             frame_schema = frame.get("schema_version", SCHEMA_VERSION)
-            if frame.get("task_id", TASK_ID) != TASK_ID or type(frame_schema) is not int or frame_schema != SCHEMA_VERSION:
+            expected_task = "semantic_mapping_v1" if frame.get("input_contract_id") == "semantic_mapping_v1" else TASK_ID
+            if frame.get("task_id", expected_task) != expected_task or type(frame_schema) is not int or frame_schema != SCHEMA_VERSION:
                 raise ValueError("frame task/schema identity mismatch")
             if "fixture" in frame and (type(frame["fixture"]) is not bool or frame["fixture"] != self.settings["fixture"]):
                 raise ValueError("frame fixture identity mismatch")
-            with Image.open(path) as original:
-                image = original.convert("RGB")
-                if image.size != (width, height):
-                    raise ValueError("original RGB dimensions mismatch")
+            if frame.get("input_contract_id") == "semantic_mapping_v1":
+                from pipeline_common.input_bridge import load_model_rgb
+                image = load_model_rgb(frame, data_root)
+            else:
+                with Image.open(path) as original:
+                    image = original.convert("RGB")
+                    if image.size != (width, height):
+                        raise ValueError("original RGB dimensions mismatch")
             union = np.zeros((height, width), dtype=np.bool_)
             result["frame"]["union_mask"] = union
-            state = self.processor.set_image(image)
+            with self._processor_context():
+                state = self.processor.set_image(image)
         except Exception as error:
             result["frame"].update(status="error", error_code=f"sam_image_error:{type(error).__name__}:{error}")
             # A valid frame whose image encoding failed still needs explicit
@@ -379,10 +414,11 @@ class Sam3Segmenter:
             else:
                 reset_succeeded = False
                 try:
-                    self.processor.reset_all_prompts(state)
-                    reset_succeeded = True
-                    query["sam_query_count"] = 1
-                    output = self.processor.set_text_prompt(state=state, prompt=phrase)
+                    with self._processor_context():
+                        self.processor.reset_all_prompts(state)
+                        reset_succeeded = True
+                        query["sam_query_count"] = 1
+                        output = self.processor.set_text_prompt(state=state, prompt=phrase)
                     query["masks"], query["scores"], capture_error = _capture(output, np, height, width, self.settings["mask_probability_threshold"])
                     if capture_error:
                         query.update(status="error", error_code=capture_error)

@@ -1,0 +1,18 @@
+{
+  "clearance": 0.05,
+  "fixture": true,
+  "footprint_radius": 0.1,
+  "height": 0.5,
+  "max_roughness": 0.03,
+  "max_slope_degrees": 25.0,
+  "max_step": 0.15,
+  "min_support_points": 3,
+  "semantic_costs": {
+    "hazard.water.v1": {
+      "blocked": true,
+      "cost": 1.0
+    }
+  },
+  "unknown_rule": "blocked",
+  "version": "synthetic_circle_robot_v1"
+}
