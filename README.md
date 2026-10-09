@@ -1,12 +1,17 @@
 # Installation
 
-Clone the repo with ```git clone --single-branch --branch non_vibed https://github.com/tomasbrogueira/EmbodiedAI.git``` \
+Clone the repo with ```git clone --single-branch --branch non_vibed https://github.com/tomasbrogueira/EmbodiedAI.git``` 
 
 **Note**: Use the EECS cluster with VSCode, using the terminal in VSCode.
 
 ## Foundation Models
 
-Clone both SAM3 and Lingbot-map to the EmbodiedAI folder (main repo folder). \
+Clone both SAM3 and Lingbot-map to the EmbodiedAI folder (main repo folder). 
+
+```bash
+git clone https://github.com/facebookresearch/sam3.git
+git clone https://github.com/Robbyant/lingbot-map.git
+```
 
 Follow the readme.me from each lingbot-map ([https://github.com/robbyant/lingbot-map](https://github.com/robbyant/lingbot-map)) and sam3 ([https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation](https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation)) for installation of each model
 
