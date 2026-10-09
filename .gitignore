@@ -7,41 +7,6 @@
 /research/traversability/CLAUDE.md
 /research/traversability/attacks.md
 
-# Data, models and generated runs
-/data/*
-/runs/
-/output/
-/outputs/
-/models/
-/weights/
-/checkpoints/
-/results/
-/.cache/
-
-# Downloaded video datasets remain outside Git
-*.[mM][pP]4
-*.[mM][oO][vV]
-*.[aA][vV][iI]
-*.[mM][kK][vV]
-*.[wW][eE][bB][mM]
-*.[mM]4[vV]
-
-# Only the 18 deliberate project recordings, manifest and guide are included.
-# Extracted frames, new downloads and exports under videos/ remain ignored.
-!/data/videos/
-/data/videos/*
-!/data/videos/README.md
-!/data/videos/manifest.json
-!/data/videos/indoor/
-/data/videos/indoor/*
-!/data/videos/indoor/IMG_550[6-8].mp4
-!/data/videos/indoor/IMG_552[2-3].mp4
-!/data/videos/outdoor/
-/data/videos/outdoor/*
-!/data/videos/outdoor/IMG_5509.mp4
-!/data/videos/outdoor/IMG_551[0-9].mp4
-!/data/videos/outdoor/IMG_552[0-1].mp4
-
 # Python and notebooks
 __pycache__/
 *.py[cod]
@@ -56,6 +21,4 @@ htmlcov/
 
 # Machine-local files
 .DS_Store
-.env
-.env.*
-!.env.example
+*.pt
