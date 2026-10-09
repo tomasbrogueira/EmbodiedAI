@@ -1,5 +1,7 @@
 # Installation
 
+Clone the repo with ```git clone --single-branch --branch non_vibed https://github.com/tomasbrogueira/EmbodiedAI.git```
+
 ## Foundation Models
 
 Follow the readme.me from each lingbot-map ([https://github.com/robbyant/lingbot-map](https://github.com/robbyant/lingbot-map)) and sam3 ([https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation](https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation)) for installation of each model
