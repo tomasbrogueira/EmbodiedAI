@@ -6,6 +6,8 @@ Clone the repo with ```git clone --single-branch --branch non_vibed https://gith
 
 ## Foundation Models
 
+Clone both SAM3 and Lingbot-map to the EmbodiedAI folder (main repo folder). \
+
 Follow the readme.me from each lingbot-map ([https://github.com/robbyant/lingbot-map](https://github.com/robbyant/lingbot-map)) and sam3 ([https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation](https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation)) for installation of each model
 
 ### Tips for installation with SAM3:
