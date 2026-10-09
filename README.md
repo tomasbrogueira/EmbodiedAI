@@ -9,23 +9,15 @@ Clone the repo with ```git clone --single-branch --branch non_vibed https://gith
 Clone both SAM3 and Lingbot-map to the EmbodiedAI folder (main repo folder). 
 
 ```bash
+cd EmbodiedAI
 git clone https://github.com/facebookresearch/sam3.git
 git clone https://github.com/Robbyant/lingbot-map.git
+mv generate_sam3_masks.py ./sam3
 ```
 
-Follow the readme.me from each lingbot-map ([https://github.com/robbyant/lingbot-map](https://github.com/robbyant/lingbot-map)) and sam3 ([https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation](https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation)) for installation of each model
+Follow the readme.me from each lingbot-map ([https://github.com/robbyant/lingbot-map](https://github.com/robbyant/lingbot-map)) until Step.3 (inclusive) and sam3 ([https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation](https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation)) until Step.3 (but do not clone the repo again).
 
-### Tips for installation with SAM3:
-
-had to dowgrade and install new libs:
-
-```bash
-pip install setuptools==69.5.1
-pip install pycocotools
-pip install psutil
-pip install opencv-python
-pip install matplotlib
-```
+Do not forget to copy the weights for lingbot-map from https://huggingface.co/robbyant/lingbot-map to the lingbot-map folder.
 
 ## Install required dependencies for orchestration and visualization
 
@@ -67,6 +59,16 @@ python3 sam3/generate_sam3_masks.py \
     --prompt floor
 ```
 
+**Note:** I had to dowgrade and install new libs:
+
+```bash
+pip install setuptools==69.5.1
+pip install pycocotools
+pip install psutil
+pip install opencv-python
+pip install matplotlib
+```
+
 ## Projecting SAM3 segmentations to 3D pointcloud (orchestration)
 
 ```bash
@@ -96,3 +98,4 @@ python3 orchestrator/view_ply.py data/combined/IMG_5522_floor_semantic_map.ply
 
 - Change the SAM3 pipeline to support multiple segmentations and update the orchestrator accordingly
 - Create a single bash script to run sequentially the pipeline, instead of running it manually
+
