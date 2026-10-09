@@ -1,6 +1,0 @@
-# CPU import, mask selection, annotation and fixture support; no model weights.
-numpy>=1.26,<3
-Pillow>=10,<13
-matplotlib>=3.8,<4
-# Optional explicit actions: gdown==6.4.1 (Drive), av>=16,<20 (phone), ipywidgets>=8,<9.
-# SAM2/PyTorch are installed separately following the official SAM2 instructions.

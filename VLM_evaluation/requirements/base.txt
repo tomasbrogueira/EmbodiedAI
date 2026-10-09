@@ -1,3 +1,0 @@
-# Minimal editable-install tooling. CPU smoke tests use only the standard library.
-setuptools>=68,<85
-wheel>=0.43,<1

@@ -1,3 +1,0 @@
-# CPU fusion/replay and contract checks; Python 3.12 recommended.
-numpy==1.26.4
-Pillow==11.3.0
