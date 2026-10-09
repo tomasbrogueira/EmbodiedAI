@@ -1,0 +1,2 @@
+[console_scripts]
+flashinfer = flashinfer.__main__:cli

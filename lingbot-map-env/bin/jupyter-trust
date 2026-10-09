@@ -1,0 +1,6 @@
+#!/home/jovyan/EmbodiedAI/lingbot-map-env/bin/python3
+import sys
+from nbformat.sign import TrustNotebookApp
+if __name__ == '__main__':
+    sys.argv[0] = sys.argv[0].removesuffix('.exe')
+    sys.exit(TrustNotebookApp.launch_instance())

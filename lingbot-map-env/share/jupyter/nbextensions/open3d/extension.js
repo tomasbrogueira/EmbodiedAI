@@ -1,0 +1,1 @@
+define(()=>(()=>{var e={252(e){window.require&&window.require.config({map:{"*":{open3d:"nbextensions/open3d/index"}}}),e.exports={load_ipython_extension(){}}}};const n={};return function o(r){const t=n[r];if(void 0!==t)return t.exports;const i=n[r]={exports:{}};return e[r](i,i.exports,o),i.exports}(252)})());
