@@ -94,8 +94,15 @@ python orchestrator/main.py \
 python3 orchestrator/view_ply.py data/combined/IMG_5522_floor_semantic_map.ply
 ```
 
+## Optional small-obstacle plugin
+
+The optional [small-obstacle plugin](plugins/small_obstacles/README.md) adds
+VLM-generated prompts, multi-prompt SAM3 union masks, and projection onto the
+LingBot point cloud without changing the existing single-prompt workflow.
+See the [detailed integration report](docs/lingbot_obstacle_plugin_integration.md)
+for the data contracts, execution commands, mask-to-world projection and validation limits.
+
 ## TODOs
 
-- Change the SAM3 pipeline to support multiple segmentations and update the orchestrator accordingly
 - Create a single bash script to run sequentially the pipeline, instead of running it manually
 

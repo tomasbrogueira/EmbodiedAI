@@ -1,0 +1,26 @@
+{
+  "previous": {
+    "videos": 18,
+    "frames": 150,
+    "invalid_responses": 0,
+    "nonempty_frames": 16,
+    "prompt_applications": 23,
+    "model": "Qwen/Qwen3-VL-4B-Instruct"
+  },
+  "improved": {
+    "videos": 18,
+    "frames": 150,
+    "invalid_responses": 0,
+    "nonempty_frames": 13,
+    "prompt_applications": 13,
+    "model": "Qwen/Qwen3-VL-4B-Instruct"
+  },
+  "sam": {
+    "segmented_frames": 13,
+    "prompt_applications": 13,
+    "empty_prompt_masks": 0,
+    "threshold": 0.5
+  },
+  "ground_truth_available": false,
+  "notes": "Counts are output statistics, not detection accuracy. Same videos used for tuning and comparison."
+}

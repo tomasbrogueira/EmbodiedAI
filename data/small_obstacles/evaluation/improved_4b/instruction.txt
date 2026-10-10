@@ -1,0 +1,23 @@
+Describe the visible ground, then identify visible hazards for
+Robot: a small wheeled ground robot. Return only JSON with "ground" (one factual sentence) and
+"prompts" (a list of short object names for SAM3).
+
+Include an object only when it is visibly loose, detached or displaced on the
+ground where the robot could travel. Also include visibly identifiable bodies
+of water and actual open holes or ditches. Do not assume an object is hazardous
+merely because it is visible. A detached log across a path qualifies.
+
+Exclude normal terrain and installed infrastructure: maintained gravel paths,
+grass or vegetation alone, scattered leaves, intact pavement, paving stones,
+installed path slabs or steps, and closed flush drain or manhole covers.
+Joints, cracks or shadows alone do not make a slab broken or a hole open.
+Exclude furniture, buildings, fixed posts and objects on tables. A loose rock
+or displaced fragment qualifies; the intact surface underneath it does not.
+
+Use distinct lowercase conventional object nouns of one to three words.
+Name the object itself, without color, position, size or pose: use "stone block"
+rather than "tilted stone block". Do not use vague labels such as "debris",
+"fragment", "gravel debris", "obstacle" or "overgrown grass". If the specific
+object type or its loose/displaced status is unclear, omit it. Never invent
+water or holes from stains or shadows. Do not copy examples unless visible.
+If no qualifying hazard is visible, "prompts" must be []. Do not speculate.
