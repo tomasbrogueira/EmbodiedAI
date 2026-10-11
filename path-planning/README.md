@@ -16,7 +16,7 @@ Plan directly on reconstructed 3D point rows. Coordinates, row order, colours, m
 | visualization/ | Viser viewer, overview and isolated route rendering |
 | test_*.py | Synthetic, cache and scheduling regressions |
 
-Repository-root reconstruct.py initializes streaming LingBot from eight uniformly spread full-recording views, then processes remaining frames and restores all output fields to original frame order. This is an offline recording method. Model code, weights, environments and generated outputs stay outside Git.
+reconstruct.py initializes streaming LingBot from eight uniformly spread full-recording views, then processes remaining frames and restores all output fields to original frame order. This is an offline recording method. Model code, weights, environments and generated outputs stay outside Git.
 
 ## Contracts
 

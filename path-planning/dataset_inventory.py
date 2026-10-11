@@ -63,7 +63,7 @@ def inventory(repo, output, pull=False):
         # Never stash, reset, or resolve conflicts in the user's checkout.
         subprocess.run(['git', '-C', str(repo), 'pull', '--ff-only'], check=True)
     old = read(output / 'manifest.json') or {}
-    model = MODEL | {'reconstruction_source_sha256': sha256(repo / 'reconstruct.py')} | {name + '_commit': command('git', '-C', str(repo / folder), 'rev-parse', 'HEAD')
+    model = MODEL | {'reconstruction_source_sha256': sha256(repo / 'path-planning/reconstruct.py')} | {name + '_commit': command('git', '-C', str(repo / folder), 'rev-parse', 'HEAD')
                      for name, folder in [('lingbot', 'lingbot-map'), ('sam', 'sam3')]}
     videos, mismatches = [], []
     root = repo / 'data' / 'videos'

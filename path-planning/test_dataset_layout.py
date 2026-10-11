@@ -27,7 +27,8 @@ class BatchLayoutTests(unittest.TestCase):
         self.repo, self.batch, self.source = (self.root / name for name in ('repo', 'batch', 'source'))
         for path in (self.repo, self.batch, self.source):
             path.mkdir()
-        (self.repo / 'reconstruct.py').write_text('current uniform anchor reconstruction')
+        (self.repo / 'path-planning').mkdir()
+        (self.repo / 'path-planning/reconstruct.py').write_text('current uniform anchor reconstruction')
         (self.source / 'dataset_prepare.py').write_text('prepare source')
         (self.source / 'dataset_path.py').write_text('association source')
 
@@ -38,7 +39,7 @@ class BatchLayoutTests(unittest.TestCase):
                     output=str(out), video=str(self.root / 'video.mp4'), frame_count=2,
                     input_sha256='video-hash', prompt='floor',
                     model_settings=inventory.MODEL | {'reconstruction_source_sha256':
-                        inventory.sha256(self.repo / 'reconstruct.py')})
+                        inventory.sha256(self.repo / 'path-planning/reconstruct.py')})
 
     def test_cpu_source_hashes_and_subprocess_do_not_follow_batch_root(self):
         entry = self.entry()
@@ -67,7 +68,7 @@ class BatchLayoutTests(unittest.TestCase):
              patch.object(gpu, 'allocation', return_value=nullcontext()), patch.object(gpu, 'command') as command:
             gpu.run(self.repo, entry)
         reconstruction, masks = [call.args[3] for call in command.call_args_list]
-        self.assertEqual(reconstruction[3], str(self.repo / 'reconstruct.py'))
+        self.assertEqual(reconstruction[3], str(self.repo / 'path-planning/reconstruct.py'))
         for flag, value in (('--mode', 'streaming'), ('--num_scale_frames', '8'),
                             ('--kv_cache_sliding_window', '32'), ('--keyframe_interval', '2')):
             self.assertEqual(reconstruction[reconstruction.index(flag) + 1], value)
@@ -78,7 +79,7 @@ class BatchLayoutTests(unittest.TestCase):
         entry = self.entry()
         receipt = Path(entry['output']) / 'gpu.json'
         receipt.write_text('{}')
-        (self.repo / 'reconstruct.py').write_text('changed reconstruction')
+        (self.repo / 'path-planning/reconstruct.py').write_text('changed reconstruction')
         with patch.object(gpu, 'command') as command, patch.object(gpu, 'allocation') as allocation:
             with self.assertRaisesRegex(RuntimeError, 'Reconstruction source/settings changed'):
                 gpu.run(self.repo, entry)
@@ -95,9 +96,9 @@ class BatchLayoutTests(unittest.TestCase):
             manifest = inventory.inventory(self.repo, self.batch)
             original = (self.batch / 'manifest.json').read_bytes()
             saved = manifest['videos'][0]['model_settings']
-            self.assertEqual(saved['reconstruction_source_sha256'], inventory.sha256(self.repo / 'reconstruct.py'))
+            self.assertEqual(saved['reconstruction_source_sha256'], inventory.sha256(self.repo / 'path-planning/reconstruct.py'))
             self.assertEqual(saved['num_scale_frames'], 8)
-            (self.repo / 'reconstruct.py').write_text('different anchors')
+            (self.repo / 'path-planning/reconstruct.py').write_text('different anchors')
             with self.assertRaisesRegex(ValueError, 'Cached inputs/settings differ'):
                 inventory.inventory(self.repo, self.batch)
         self.assertEqual((self.batch / 'manifest.json').read_bytes(), original)

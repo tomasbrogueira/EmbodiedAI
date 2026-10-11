@@ -29,12 +29,12 @@ pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
 
 ## Getting lingbot-map pointcloud
 
-For offline recordings, reconstruct.py initializes LingBot jointly from eight evenly spaced video views, then processes the remaining frames and restores every output to its original frame number. This reduces the observed scale drift without changing masks or planning rules. It uses future video frames and is not an online method. Rebuild the map, slopes and costs when reconstruction outputs change.
+For offline recordings, path-planning/reconstruct.py initializes LingBot jointly from eight evenly spaced video views, then processes the remaining frames and restores every output to its original frame number. This reduces the observed scale drift without changing masks or planning rules. It uses future video frames and is not an online method. Rebuild the map, slopes and costs when reconstruction outputs change.
 
 ```bash
 conda deactivate
 conda activate lingbot-map
-python3 reconstruct.py \
+python3 path-planning/reconstruct.py \
     --video_path data/videos/indoor/IMG_5522.mp4 \
     --output_folder data/lingbot_output/ \
     --model_path lingbot-map/lingbot-map.pt \

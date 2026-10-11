@@ -15,7 +15,7 @@ except ImportError:
 
 if torch is not None:
     repo = Path(os.environ.get("DATASET_REPO", Path(__file__).resolve().parents[1]))
-    spec = importlib.util.spec_from_file_location("reconstruct_under_test", repo / "reconstruct.py")
+    spec = importlib.util.spec_from_file_location("reconstruct_under_test", repo / "path-planning/reconstruct.py")
     reconstruct = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(reconstruct)
 

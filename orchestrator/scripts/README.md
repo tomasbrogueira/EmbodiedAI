@@ -45,4 +45,4 @@ Keep the terminal running; press Ctrl+C to stop. The default port is 8080.
 
 ## Settings
 
-The wrappers use the current reconstruct.py (streaming, eight spread initialization views, original frame order) and path-planning/generate_masks.py (existing masks with CPU video storage). Map filters are unchanged. They install nothing and preserve new-output checks and failure propagation. See the [path-planning guide](../../path-planning/README.md) for costs, routes, visualization and tests. Model inference is not part of the CPU regression suite.
+The wrappers use the current path-planning/reconstruct.py (streaming, eight spread initialization views, original frame order) and path-planning/generate_masks.py (existing masks with CPU video storage). Map filters are unchanged. They install nothing and preserve new-output checks and failure propagation. See the [path-planning guide](../../path-planning/README.md) for costs, routes, visualization and tests. Model inference is not part of the CPU regression suite.

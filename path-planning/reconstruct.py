@@ -36,7 +36,7 @@ def run_with_anchors(run, model, images, args):
 
 
 def main():
-    lingbot = Path(__file__).resolve().parent / 'lingbot-map'
+    lingbot = Path(__file__).resolve().parents[1] / 'lingbot-map'
     sys.path[:0] = [str(lingbot / 'demo_render'), str(lingbot)]
     import batch_demo
     run = batch_demo.run_inference

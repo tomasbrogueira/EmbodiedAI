@@ -51,7 +51,7 @@ def command(repo, out, stage, args, cwd, valid):
 
 
 def run(repo, entry):
-    expected = MODEL | {'reconstruction_source_sha256': sha256(repo / 'reconstruct.py')}
+    expected = MODEL | {'reconstruction_source_sha256': sha256(repo / 'path-planning/reconstruct.py')}
     if any(entry.get('model_settings', {}).get(key) != value for key, value in expected.items()):
         raise RuntimeError('Reconstruction source/settings changed; inventory a separate output directory')
     out, name, count = Path(entry['output']), entry['name'], entry['frame_count']
@@ -72,7 +72,7 @@ def run(repo, entry):
             results = json.loads(result.read_text()).get('results', [])
             return len(results) == 1 and results[0].get('success') and frames(ling / name, count)
         command(repo, out, 'reconstruction', [str(repo / '.setup/envs/lingbot-map/bin/python'), '-B', '-u',
-            str(repo / 'reconstruct.py'), '--video_path', entry['video'], '--output_folder', str(ling),
+            str(repo / 'path-planning/reconstruct.py'), '--video_path', entry['video'], '--output_folder', str(ling),
             '--model_path', str(repo / 'lingbot-map/lingbot-map.pt'), '--mode', 'streaming', '--kv_cache_sliding_window', '32',
             '--keyframe_interval', '2', '--num_scale_frames', '8', '--max_frame_num', str(max(1024, count)),
             '--use_sdpa', '--save_predictions', '--no_render', '--no_original_video', '--num_workers', '4'], repo / 'lingbot-map', ling_valid)
