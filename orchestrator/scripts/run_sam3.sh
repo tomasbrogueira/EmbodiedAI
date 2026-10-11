@@ -8,10 +8,10 @@ video="$(realpath -m -- "$1")"
 prompt="$2"
 output="$(realpath -m -- "$3")"
 require_file "$video"
-require_file "$PROJECT_ROOT/sam3/generate_sam3_masks.py"
+require_file "$PROJECT_ROOT/path-planning/generate_masks.py"
 check_prompt "$prompt"
 require_new_path "$output"
 activate_env sam3
 new_output_dir "$output"
-exec python3 -u sam3/generate_sam3_masks.py \
+exec python3 -u path-planning/generate_masks.py \
     --video_path "$video" --output_folder "$output" --prompt="$prompt"

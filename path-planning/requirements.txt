@@ -1,0 +1,4 @@
+numpy
+scipy
+pillow
+viser==1.1.1

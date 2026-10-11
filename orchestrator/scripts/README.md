@@ -43,17 +43,6 @@ bash orchestrator/scripts/view_map.sh .setup/runs/my-run/semantic_map.ply
 Open the [KTH viewer](https://gpu1.eecs.kth.se/user/tombro/vscode/proxy/8080/?websocket=wss://gpu1.eecs.kth.se/user/tombro/vscode/proxy/8080).
 Keep the terminal running; press Ctrl+C to stop. The default port is 8080.
 
-## Settings and verification
+## Settings
 
-Processing settings follow the root README. The approved exception is LingBot's
-`--no_render`: predictions are saved, but its video renderer is skipped.
-The PLY viewer still works. No dependencies or existing Python files were changed.
-
-Verified on KTH on **2026-10-10** with the 32-frame clip and `floor` prompt:
-exit 0, 32 predictions, 32 masks, and a 3,732,781-point PLY. The viewer was tested
-separately with its default 500,000-point sample. Shell syntax, argument checks,
-overwrite protection and failure propagation also passed.
-
-Results and logs: `.setup/verification/scripts smoke 20261010/`.
-Long videos, other prompts, segmentation accuracy, and LingBot video rendering
-were not verified.
+The wrappers use the current reconstruct.py (streaming, eight spread initialization views, original frame order) and path-planning/generate_masks.py (existing masks with CPU video storage). Map filters are unchanged. They install nothing and preserve new-output checks and failure propagation. See the [path-planning guide](../../path-planning/README.md) for costs, routes, visualization and tests. Model inference is not part of the CPU regression suite.

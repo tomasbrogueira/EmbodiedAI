@@ -22,3 +22,17 @@ htmlcov/
 # Machine-local files
 .DS_Store
 *.pt
+
+# Generated planning outputs, native builds and model checkouts
+/.setup/
+/lingbot-map/
+/sam3/
+*.so
+*.dll
+*.dylib
+/path-planning/visualization/viewer-client/
+/path-planning/runs/
+/path-planning/*.log
+/path-planning/*.lock
+/path-planning/*.npz
+/path-planning/*.npy

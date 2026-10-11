@@ -1,3 +1,5 @@
+> Historical setup record. Current entry points are documented in [README](README.md) and [workflow scripts](orchestrator/scripts/README.md).
+
 # KTH setup fixes and verification
 
 This records only the installation differences and verification for the isolated

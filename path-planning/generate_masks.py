@@ -1,8 +1,11 @@
 import argparse
 from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "sam3"))
 
 import numpy as np
 from sam3.model_builder import build_sam3_video_predictor
+from sam_cpu_video import keep_video_on_cpu
 
 
 def parse_args():
@@ -64,6 +67,7 @@ def main():
     print("=" * 60)
 
     predictor = build_sam3_video_predictor()
+    keep_video_on_cpu(predictor.model)
     session_id = None
 
     try:
@@ -72,6 +76,8 @@ def main():
             request={
                 "type": "start_session",
                 "resource_path": str(video_path),
+                "offload_video_to_cpu": True,
+                "offload_state_to_cpu": True,
             }
         )
 
