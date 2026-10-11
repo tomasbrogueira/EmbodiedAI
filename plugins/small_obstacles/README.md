@@ -9,6 +9,29 @@ The [detailed integration report](../../docs/lingbot_obstacle_plugin_integration
 explains the saved prediction contract, camera-to-world geometry, scene export,
 deployment commands and evaluation limits.
 
+For direct video input with incremental map updates and live Viser viewing, see
+the separate [streaming runner](STREAMING.md). It keeps models resident, refreshes
+prompts asynchronously and creates fresh masks on mapped frames. The original
+batch commands below remain available.
+
+The live viewer also provides a VLM instruction editor with persistent named
+presets, and a **Manual SAM prompts** mode to query your own object names while
+skipping Qwen. Each run records its exact instruction or manual query list; see
+the [viewer controls](STREAMING.md#editing-and-testing-prompts).
+
+The [hardware and performance analysis](../../docs/vlm_performance_analysis.md)
+and [implementation plan](../../docs/vlm_performance_implementation_plan.md)
+record measured model costs, the streaming cache memory limit, and proposed
+plugin-only improvements. Diagnostic results are in
+`data/vlm_maps/performance_analysis/`.
+
+The first improvements are implemented in the optional streaming runner:
+configurable LingBot cache size, GPU/host memory telemetry, unused CUDA allocator
+block release, and opt-in SAM text caching with a GPU mask union. See the
+[bounded-cache results](../../docs/vlm_bounded_cache_results.md) for the tested
+command, full-video timings, exact-mask/map checks, and geometry differences.
+The original cache size and SAM path remain the defaults.
+
 ## Inputs and output
 
 Use a LingBot prediction directory containing `frame_*.npz`, saved using the
