@@ -15,5 +15,3 @@ class PromptState:
     def active(self, source_time):
         self.seen = {p: t for p, t in self.seen.items() if source_time - t <= self.ttl}
         return [p for p, _ in sorted(self.seen.items(), key=lambda pair: pair[1], reverse=True)][:self.max_prompts]
-
-

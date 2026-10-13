@@ -518,5 +518,3 @@ def fixed_start_segment(cm, poses, native, find_path, update):
     result = exact_route(cm, start['id'], goal['id'], associated, native, find_path, update,
                          allow_partial=True)
     return start, goal, result, 1
-
-

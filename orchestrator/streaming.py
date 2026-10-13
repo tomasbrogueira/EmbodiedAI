@@ -508,7 +508,7 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
                     native = ROOT / 'path-planning/corridor_astar_feasible.so'
                     route(cost_dir, route_dir, library=native if native.exists() else None)
                     state['outputs']['route'] = str(route_dir)
-        state['status'] = 'complete' 
+        state['status'] = 'complete'
     except RunCancelled:
         state['status'] = 'stopped'
         points_view, colors_view = display.arrays()

@@ -64,5 +64,3 @@ class LingBotStream:
         np.savez(request['output'], images=rgb, **arrays)
         self.count += len(images)
         return {'frames': len(images)}
-
-
