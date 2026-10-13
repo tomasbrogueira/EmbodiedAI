@@ -1,0 +1,5 @@
+# Install in a VLM environment with matching PyTorch / torchvision builds.
+transformers>=4.57.0,<6
+accelerate>=1.0,<2
+Pillow>=10
+numpy>=1.24

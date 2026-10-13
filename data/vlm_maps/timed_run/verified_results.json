@@ -1,0 +1,369 @@
+{
+  "videos": 18,
+  "prediction_frames": 7796,
+  "selected_frames": 3903,
+  "batch_wall_seconds": 5636.39432696905,
+  "scene_wall_seconds": 5636.370879408903,
+  "stage_wall_seconds": {
+    "lingbot": 2663.0286108562723,
+    "vlm": 2293.123165356461,
+    "sam": 422.6991945146583,
+    "adapt_masks": 60.37725777737796,
+    "mapping": 196.87263153120875
+  },
+  "marked_observations": 6548998,
+  "vertices": 692691864,
+  "checks": "All scenes complete; VLM, SAM and mapper frame selections agree; PLY payload sizes and logged point counts agree.",
+  "scenes": [
+    {
+      "video": "IMG_5506",
+      "group": "indoor",
+      "prediction_frames": 320,
+      "selected_frames": 160,
+      "prompts": [],
+      "seconds": 228.41838620835915,
+      "stage_seconds": {
+        "lingbot": 114.86959659308195,
+        "vlm": 99.57726689707488,
+        "sam": 2.116778110153973,
+        "adapt_masks": 2.488948711194098,
+        "mapping": 9.353460442274809
+      },
+      "vertices": 41341899,
+      "marked_observations": 0,
+      "ply": "indoor/IMG_5506/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5507",
+      "group": "indoor",
+      "prediction_frames": 340,
+      "selected_frames": 170,
+      "prompts": [],
+      "seconds": 234.6948136370629,
+      "stage_seconds": {
+        "lingbot": 126.61314902594313,
+        "vlm": 93.40853273496032,
+        "sam": 2.212078385055065,
+        "adapt_masks": 2.7421988686546683,
+        "mapping": 9.706456531304866
+      },
+      "vertices": 43516670,
+      "marked_observations": 0,
+      "ply": "indoor/IMG_5507/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5508",
+      "group": "indoor",
+      "prediction_frames": 499,
+      "selected_frames": 250,
+      "prompts": [],
+      "seconds": 325.40600756695494,
+      "stage_seconds": {
+        "lingbot": 176.1695977030322,
+        "vlm": 128.98556532990187,
+        "sam": 3.014590236824006,
+        "adapt_masks": 3.759469650220126,
+        "mapping": 13.459909210912883
+      },
+      "vertices": 61495713,
+      "marked_observations": 0,
+      "ply": "indoor/IMG_5508/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5522",
+      "group": "indoor",
+      "prediction_frames": 672,
+      "selected_frames": 336,
+      "prompts": [
+        "bag",
+        "black bag",
+        "fabric"
+      ],
+      "seconds": 484.75149464514107,
+      "stage_seconds": {
+        "lingbot": 208.0817699469626,
+        "vlm": 166.5176720013842,
+        "sam": 88.82328970823437,
+        "adapt_masks": 5.135752711910754,
+        "mapping": 16.171406854875386
+      },
+      "vertices": 61515223,
+      "marked_observations": 173878,
+      "ply": "indoor/IMG_5522/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5523",
+      "group": "indoor",
+      "prediction_frames": 655,
+      "selected_frames": 328,
+      "prompts": [],
+      "seconds": 396.99670585105196,
+      "stage_seconds": {
+        "lingbot": 197.55662456015125,
+        "vlm": 174.14557915413752,
+        "sam": 3.895083679817617,
+        "adapt_masks": 4.8936956180259585,
+        "mapping": 16.485216829925776
+      },
+      "vertices": 69126757,
+      "marked_observations": 0,
+      "ply": "indoor/IMG_5523/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5509",
+      "group": "outdoor",
+      "prediction_frames": 321,
+      "selected_frames": 161,
+      "prompts": [],
+      "seconds": 228.08387545589358,
+      "stage_seconds": {
+        "lingbot": 117.62251095008105,
+        "vlm": 97.95997565984726,
+        "sam": 2.0274857729673386,
+        "adapt_masks": 2.5439795390702784,
+        "mapping": 7.9180345623753965
+      },
+      "vertices": 21093451,
+      "marked_observations": 0,
+      "ply": "outdoor/IMG_5509/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5510",
+      "group": "outdoor",
+      "prediction_frames": 339,
+      "selected_frames": 170,
+      "prompts": [
+        "stone block",
+        "tilted stone block",
+        "square stone block"
+      ],
+      "seconds": 303.09793873736635,
+      "stage_seconds": {
+        "lingbot": 125.82258867099881,
+        "vlm": 111.96851142216474,
+        "sam": 53.33501170994714,
+        "adapt_masks": 2.650561752729118,
+        "mapping": 9.308833659160882
+      },
+      "vertices": 34939201,
+      "marked_observations": 4240089,
+      "ply": "outdoor/IMG_5510/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5511",
+      "group": "outdoor",
+      "prediction_frames": 620,
+      "selected_frames": 310,
+      "prompts": [],
+      "seconds": 421.379099404905,
+      "stage_seconds": {
+        "lingbot": 218.50421688100323,
+        "vlm": 180.54173030517995,
+        "sam": 3.7879059659317136,
+        "adapt_masks": 4.685629206709564,
+        "mapping": 13.83993496792391
+      },
+      "vertices": 36472709,
+      "marked_observations": 0,
+      "ply": "outdoor/IMG_5511/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5512",
+      "group": "outdoor",
+      "prediction_frames": 489,
+      "selected_frames": 245,
+      "prompts": [
+        "red object"
+      ],
+      "seconds": 389.6182845477015,
+      "stage_seconds": {
+        "lingbot": 174.77035952778533,
+        "vlm": 150.6269039111212,
+        "sam": 48.109787922818214,
+        "adapt_masks": 3.8677397542633116,
+        "mapping": 12.226482457946986
+      },
+      "vertices": 36478050,
+      "marked_observations": 47904,
+      "ply": "outdoor/IMG_5512/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5513",
+      "group": "outdoor",
+      "prediction_frames": 323,
+      "selected_frames": 162,
+      "prompts": [],
+      "seconds": 226.8161239400506,
+      "stage_seconds": {
+        "lingbot": 117.47298274608329,
+        "vlm": 95.7775991638191,
+        "sam": 2.39560272032395,
+        "adapt_masks": 2.6032250341959298,
+        "mapping": 8.554846676066518
+      },
+      "vertices": 31753901,
+      "marked_observations": 0,
+      "ply": "outdoor/IMG_5513/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5514",
+      "group": "outdoor",
+      "prediction_frames": 550,
+      "selected_frames": 275,
+      "prompts": [],
+      "seconds": 381.76979810232297,
+      "stage_seconds": {
+        "lingbot": 197.08673039404675,
+        "vlm": 163.7164275581017,
+        "sam": 3.315873419865966,
+        "adapt_masks": 4.170250873081386,
+        "mapping": 13.462501662317663
+      },
+      "vertices": 49163145,
+      "marked_observations": 0,
+      "ply": "outdoor/IMG_5514/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5515",
+      "group": "outdoor",
+      "prediction_frames": 197,
+      "selected_frames": 99,
+      "prompts": [
+        "fallen log",
+        "log",
+        "detached log"
+      ],
+      "seconds": 197.7845238149166,
+      "stage_seconds": {
+        "lingbot": 77.21952153975144,
+        "vlm": 77.72614936390892,
+        "sam": 35.609463882632554,
+        "adapt_masks": 1.6127112549729645,
+        "mapping": 5.608343202620745
+      },
+      "vertices": 17094576,
+      "marked_observations": 210164,
+      "ply": "outdoor/IMG_5515/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5516",
+      "group": "outdoor",
+      "prediction_frames": 349,
+      "selected_frames": 175,
+      "prompts": [
+        "log",
+        "fallen log"
+      ],
+      "seconds": 301.97766239894554,
+      "stage_seconds": {
+        "lingbot": 129.46923991572112,
+        "vlm": 115.89565679198131,
+        "sam": 45.28098341822624,
+        "adapt_masks": 2.7380565870553255,
+        "mapping": 8.580574683379382
+      },
+      "vertices": 23792511,
+      "marked_observations": 863447,
+      "ply": "outdoor/IMG_5516/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5517",
+      "group": "outdoor",
+      "prediction_frames": 223,
+      "selected_frames": 112,
+      "prompts": [
+        "detached log",
+        "fallen log",
+        "log"
+      ],
+      "seconds": 219.1533224452287,
+      "stage_seconds": {
+        "lingbot": 86.19776070630178,
+        "vlm": 85.51893487386405,
+        "sam": 39.46957570314407,
+        "adapt_masks": 1.7860076650977135,
+        "mapping": 6.1715665850788355
+      },
+      "vertices": 18445469,
+      "marked_observations": 706080,
+      "ply": "outdoor/IMG_5517/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5518",
+      "group": "outdoor",
+      "prediction_frames": 357,
+      "selected_frames": 179,
+      "prompts": [
+        "red object",
+        "broken concrete piece"
+      ],
+      "seconds": 284.396137163043,
+      "stage_seconds": {
+        "lingbot": 113.58942382596433,
+        "vlm": 112.52898374991491,
+        "sam": 46.57922692736611,
+        "adapt_masks": 2.806645398028195,
+        "mapping": 8.87901706295088
+      },
+      "vertices": 27436944,
+      "marked_observations": 85036,
+      "ply": "outdoor/IMG_5518/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5519",
+      "group": "outdoor",
+      "prediction_frames": 382,
+      "selected_frames": 191,
+      "prompts": [],
+      "seconds": 247.42770849494264,
+      "stage_seconds": {
+        "lingbot": 118.74431920098141,
+        "vlm": 113.64379949960858,
+        "sam": 2.3939342820085585,
+        "adapt_masks": 2.958827040158212,
+        "mapping": 9.673515358008444
+      },
+      "vertices": 32335378,
+      "marked_observations": 0,
+      "ply": "outdoor/IMG_5519/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5520",
+      "group": "outdoor",
+      "prediction_frames": 862,
+      "selected_frames": 431,
+      "prompts": [],
+      "seconds": 533.0247505558655,
+      "stage_seconds": {
+        "lingbot": 266.15612044231966,
+        "vlm": 235.15105814486742,
+        "sam": 5.135146755725145,
+        "adapt_masks": 6.539067984092981,
+        "mapping": 20.015962963923812
+      },
+      "vertices": 67801098,
+      "marked_observations": 0,
+      "ply": "outdoor/IMG_5520/obstacle_map.ply"
+    },
+    {
+      "video": "IMG_5521",
+      "group": "outdoor",
+      "prediction_frames": 298,
+      "selected_frames": 149,
+      "prompts": [
+        "stone block"
+      ],
+      "seconds": 231.57424643915147,
+      "stage_seconds": {
+        "lingbot": 97.08209822606295,
+        "vlm": 89.43281879462302,
+        "sam": 35.19737591361627,
+        "adapt_masks": 2.394490127917379,
+        "mapping": 7.456567820161581
+      },
+      "vertices": 18889169,
+      "marked_observations": 222400,
+      "ply": "outdoor/IMG_5521/obstacle_map.ply"
+    }
+  ]
+}

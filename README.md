@@ -97,3 +97,7 @@ python3 orchestrator/view_ply.py data/combined/IMG_5522_floor_semantic_map.ply
 See [path-planning](path-planning/README.md) for original-point slopes, costs, recording routes, batch tools and the three-mode Viser viewer. Keep generated outputs outside the repository.
 
 The [workflow scripts](orchestrator/scripts/README.md) run reconstruction, masks and map export using the existing KTH environments.
+
+## VLM and semantic mapping
+
+The [semantic mapping plugin](plugins/small_obstacles/README.md) supports VLM proposals and multi-query SAM masks. See the [integration plan](docs/integration_merge_plan.md) for the six-component architecture.
