@@ -298,19 +298,20 @@ bool impossible(const double* a, const double* b, double length, double radius,
 }
 }
 
-extern "C" int corridor_astar_clearance(const double* xyz, const double* cost, const double* reference,
+static int search_policy(const double* xyz, const double* cost, const double* reference,
                                Id n, double radius, double tan_slope, double cmin, double upper,
                                Id start, Id goal, const Id* banned_pairs, Id banned_count,
                                double* g, Id* previous,
                                const double* original_xyz, Id original_count,
                                const Id* support_rows, Id support_count,
                                const Id* obstacle_rows, Id obstacle_count,
-                               double max_gap, double obstacle_margin, double clearance_height) {
+                               double max_gap, double obstacle_margin, double clearance_height, int slope_enabled) {
     try {
         if (!xyz || !cost || !reference || !g || !previous || n <= 0
                 || n > std::numeric_limits<int>::max() || start < 0 || start >= n
                 || goal < 0 || goal >= n || banned_count < 0 || (banned_count && !banned_pairs)
                 || !std::isfinite(radius) || radius < 0 || !std::isfinite(radius * radius)
+                || (slope_enabled != 0 && slope_enabled != 1)
                 || !std::isfinite(tan_slope) || tan_slope <= 0
                 || !std::isfinite(cmin) || cmin <= 0 || !std::isfinite(upper) || upper < 0
                 || original_count < 0 || original_count > std::numeric_limits<int>::max()
@@ -403,7 +404,7 @@ extern "C" int corridor_astar_clearance(const double* xyz, const double* cost, c
                     const double x = dx - height * reference[0];
                     const double y = dy - height * reference[1];
                     const double z = dz - height * reference[2];
-                    if (std::abs(height) > std::sqrt(x * x + y * y + z * z) * tan_slope + 1e-12)
+                    if (slope_enabled && std::abs(height) > std::sqrt(x * x + y * y + z * z) * tan_slope + 1e-12)
                         return; // Relaxation only; final edges use original feasibility.
                     if ((support_count || obstacle_count)
                             && impossible(current.row < other ? a : b, current.row < other ? b : a,
@@ -422,6 +423,35 @@ extern "C" int corridor_astar_clearance(const double* xyz, const double* cost, c
     } catch (...) {
         return -3;
     }
+}
+
+// Versioned policy export: slope_enabled is an explicit switch, not a fake angle.
+extern "C" int corridor_astar_policy(const double* xyz, const double* cost, const double* reference,
+                               Id n, double radius, double tan_slope, double cmin, double upper,
+                               Id start, Id goal, const Id* banned_pairs, Id banned_count,
+                               double* g, Id* previous,
+                               const double* original_xyz, Id original_count,
+                               const Id* support_rows, Id support_count,
+                               const Id* obstacle_rows, Id obstacle_count,
+                               double max_gap, double obstacle_margin, double clearance_height, int slope_enabled) {
+    return search_policy(xyz, cost, reference, n, radius, tan_slope, cmin, upper,
+        start, goal, banned_pairs, banned_count, g, previous, original_xyz, original_count,
+        support_rows, support_count, obstacle_rows, obstacle_count, max_gap, obstacle_margin,
+        clearance_height, slope_enabled);
+}
+
+extern "C" int corridor_astar_clearance(const double* xyz, const double* cost, const double* reference,
+                               Id n, double radius, double tan_slope, double cmin, double upper,
+                               Id start, Id goal, const Id* banned_pairs, Id banned_count,
+                               double* g, Id* previous,
+                               const double* original_xyz, Id original_count,
+                               const Id* support_rows, Id support_count,
+                               const Id* obstacle_rows, Id obstacle_count,
+                               double max_gap, double obstacle_margin, double clearance_height) {
+    return search_policy(xyz, cost, reference, n, radius, tan_slope, cmin, upper,
+        start, goal, banned_pairs, banned_count, g, previous, original_xyz, original_count,
+        support_rows, support_count, obstacle_rows, obstacle_count, max_gap, obstacle_margin,
+        clearance_height, 1);
 }
 
 // Keep the previous ABI usable for baseline parity checks and older callers.

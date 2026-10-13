@@ -27,6 +27,8 @@ htmlcov/
 /.setup/
 /lingbot-map/
 /sam3/
+/lingbot-map
+/sam3
 *.so
 *.dll
 *.dylib

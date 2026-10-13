@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 
-from io_utils import frame_number
+from orchestrator.io_utils import frame_number
 
 
 def load_sam_mask(path: Path) -> np.ndarray:

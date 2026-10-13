@@ -1,0 +1,2 @@
+-r visualizer.txt
+opencv-python-headless>=4.8,<4.12

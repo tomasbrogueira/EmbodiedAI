@@ -1,0 +1,9 @@
+{
+  "output": "/absolute/path/outside/repository/new-derived-run",
+  "inputs": {"snapshot": "/absolute/path/to/combined-run/map"},
+  "geometry": {"mode": "off"},
+  "vlm": {"mode": "off"},
+  "analysis": {"steepness": "off", "costs": "compute"},
+  "planning": {"enabled": true, "slope_policy": "disabled"},
+  "visualizer": {"enabled": false}
+}

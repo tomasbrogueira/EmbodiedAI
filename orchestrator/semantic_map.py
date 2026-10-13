@@ -2,16 +2,16 @@
 
 import numpy as np
 
-from io_utils import (
+from orchestrator.io_utils import (
     frame_number,
     load_depth_map,
     load_extrinsic,
     load_intrinsic,
     load_rgb,
 )
-from lingbot_geometry import depth_to_world_points
-from pointcloud import save_binary_ply
-from sam_masks import (
+from orchestrator.lingbot_geometry import depth_to_world_points
+from orchestrator.pointcloud import save_binary_ply
+from orchestrator.sam_masks import (
     build_sam_index,
     load_sam_mask,
     preprocess_mask,

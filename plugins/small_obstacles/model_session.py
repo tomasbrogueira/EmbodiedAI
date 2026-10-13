@@ -1,105 +1,12 @@
-"""Own reusable model workers across independent video runs."""
-import json
+"""Compatibility entry point; implementation lives in orchestrator/model_session.py."""
+import sys
 from pathlib import Path
-import threading
-from uuid import uuid4
-
-ROLES = ('lingbot', 'vlm', 'sam')
-
-
-def required_roles(config):
-    return ('lingbot', 'sam') if config.get('proposal_mode') == 'manual' else ROLES
-
-
-MODEL_SETTINGS = ('lingbot_python', 'vlm_python', 'sam_python', 'lingbot_checkpoint',
-    'sam_checkpoint', 'vlm_model', 'max_new_tokens', 'image_size', 'camera_iterations',
-    'max_frame_num', 'kv_cache_window', 'worker_threads', 'sam_text_cache', 'sam_text_cache_size')
-
-
-class ModelSession:
-    def __init__(self, worker_factory=None):
-        if worker_factory is None:
-            from .run_streaming import Worker
-            worker_factory = Worker
-        self.factory = worker_factory
-        self.workers = {}
-        self.signature = None
-        self.active = False
-        self.lock = threading.Lock()
-        self.id = uuid4().hex
-
-    @property
-    def loaded(self):
-        with self.lock:
-            return all(role in self.workers for role in ('lingbot', 'sam')) and all(
-                w.process.poll() is None for w in self.workers.values())
-
-    @property
-    def loaded_roles(self):
-        with self.lock:
-            return tuple(role for role, worker in self.workers.items() if worker.process.poll() is None)
-
-    def _close_workers(self):
-        with self.lock:
-            workers, self.workers = self.workers, {}
-            self.signature = None
-        for worker in reversed(list(workers.values())):
-            worker.close()
-
-    def begin(self, config_path, directory, on_loading, on_ready):
-        config = json.loads(Path(config_path).read_text())
-        signature = tuple(config.get(key) for key in MODEL_SETTINGS)
-        with self.lock:
-            if self.active:
-                raise RuntimeError('Model session already has an active video')
-            self.active = True
-        try:
-            if not self.loaded or signature != self.signature:
-                self._close_workers()
-            roles = required_roles(config)
-            for role in roles:
-                on_loading(role)
-                worker = self.workers.get(role)
-                reused = worker is not None
-                if reused:
-                    result = worker.call(op='reset', config=str(config_path))
-                    result.update(load_seconds=0., original_load_seconds=worker.ready['load_seconds'])
-                else:
-                    worker = self.factory(role, config[role+'_python'], config_path, directory)
-                    with self.lock:
-                        self.workers[role] = worker
-                    result = dict(worker.ready)
-                result.update(reused=reused, process_id=worker.process.pid, session_id=self.id)
-                on_ready(role, worker, result)
-            self.signature = signature
-            return [self.workers[role] for role in roles]
-        except BaseException:
-            self._close_workers()
-            with self.lock:
-                self.active = False
-            raise
-
-    def finish(self, healthy=True):
-        """Drain outstanding work and drop sequence tensors, retaining weights."""
-        results = {}
-        try:
-            if not healthy:
-                self._close_workers()
-                return results
-            for role, worker in self.workers.items():
-                if worker.pending:
-                    worker.receive()
-                results[role] = worker.call(op='release_sequence')
-            return results
-        except BaseException:
-            self._close_workers()
-            raise
-        finally:
-            with self.lock:
-                self.active = False
-
-    def close(self):
-        with self.lock:
-            if self.active:
-                raise RuntimeError('Stop the active video before unloading models')
-        self._close_workers()
+import importlib
+import runpy
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+if __name__ == "__main__":
+    runpy.run_module('orchestrator.model_session', run_name="__main__")
+else:
+    _implementation = importlib.import_module('orchestrator.model_session')
+    globals().update({k: v for k, v in vars(_implementation).items() if not k.startswith("__")})
+    sys.modules[__name__] = _implementation

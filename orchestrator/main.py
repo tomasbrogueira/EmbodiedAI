@@ -1,3 +1,8 @@
+# Support direct compatibility-script execution without environment mutation.
+if __package__ in (None, ''):
+    import sys as _sys
+    from pathlib import Path as _Path
+    _sys.path.insert(0, str(_Path(__file__).resolve().parents[1]))
 """CLI entry point for the SAM3 + LingBot-MAP orchestrator."""
 
 import argparse
@@ -5,7 +10,7 @@ from pathlib import Path
 
 import numpy as np
 
-from semantic_map import build_semantic_point_cloud
+from orchestrator.semantic_map import build_semantic_point_cloud
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]

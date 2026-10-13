@@ -1,3 +1,22 @@
+# Integrated perception and planning
+
+This branch combines `path-planning-cleanup` and `vlm_improvements` into six
+components: path planner, VLM, orchestrator, SAM, LingBot-MAP and visualizer.
+
+Read [Integrated pipelines](docs/INTEGRATED_PIPELINES.md) for standalone commands,
+combined runs, feature switches, traversability targets and independent SAM queries.
+See [Validation](docs/INTEGRATION_VALIDATION.md) for the checks performed.
+
+- VLM can propose traversable or non-traversable regions.
+- Extra SAM traversability queries such as `path` run independently alongside it.
+- Positive evidence expands support candidates; negative evidence vetoes overlaps
+  in the cost map and certified routes.
+- Steepness, cost generation and route search are separately selectable.
+- Model environments remain separate; analysis can reuse saved snapshots.
+
+The existing installation and command examples below remain available through
+compatibility entry points.
+
 # Installation
 
 Clone the repo with ```git clone --single-branch --branch non_vibed https://github.com/tomasbrogueira/EmbodiedAI.git``` 

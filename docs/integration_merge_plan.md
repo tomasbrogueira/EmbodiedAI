@@ -1,6 +1,8 @@
 # Integrating path-planning-cleanup and vlm_improvements
 
-Status: implementation plan; no branch merge or implementation performed.
+Status: initial offline and finalized-stream integration implemented on
+`integration/path-planning-vlm`. See INTEGRATED_PIPELINES.md and
+INTEGRATION_VALIDATION.md. Continuous prefix replanning remains a later extension.
 
 Updated requirement: every stage must support standalone execution and composition.
 Slope/steepness analysis and path planning are separately switchable features,
@@ -67,7 +69,7 @@ lingbot-map/. SAM follows the same pattern with sam/ and external sam3/.
 ```text
 repo/
   path-planning/             Planner algorithms and native search
-    path_planner/           Importable implementation, introduced incrementally
+  path_planner/             Independent importable numerical implementation
     test_*.py               Existing contracts, moved only with compatibility
     corridor_astar_feasible.cpp
     planner.py, ...          Temporary compatibility entry points
@@ -802,3 +804,11 @@ Open implementation decisions: final import/package naming within the existing
 path-planning folder; exact supported environment/checkpoint pins; and whether
 incremental replanning is included after the initial offline/finalized-stream
 release. These do not prevent the initial integration design above.
+
+## Implementation resolution
+
+The numerical package is at root path_planner/; path-planning/ preserves legacy
+entry points, the native build location and regression tests. The six first-party
+component packages and standalone/composed CLIs are implemented. Finalized causal
+streams support optional analysis and routing; continuous prefix replanning is
+not included. Model inference remains in separately supplied environments.
