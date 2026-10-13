@@ -436,8 +436,6 @@ startup conditions. Real robot footprint/kinematic constraints require explicit
 configuration; the existing camera-relative clearance model is not a calibrated
 robot body model.
 
-## Primary references
-
 ## Pre-implementation benchmark gate
 
 Before integrating application code, run experimental CPU-only prototypes outside
@@ -457,6 +455,38 @@ fast search alone. Reject methods that lose negative evidence, bridge unknown
 space, invent start connections, fail route continuity, or exceed their budgets.
 Revise implementation choices and acceptance targets using those results before
 starting application changes.
+
+### Decisions from the saved-data benchmarks
+
+See [FRAMEWISE_BENCHMARKS.md](FRAMEWISE_BENCHMARKS.md) for measured results.
+Use an initially fixed-capacity grid with original observed point representatives.
+Generate approximate grid slope costs cheaply, then refine the original robust
+slope estimator only at proposed route points. Reject/refine the route when
+those checks fail. Keep source/frame identity with each representative and cache
+its observation-specific slope results; geometrically coincident measurements
+from different frames must not silently share one slope estimate.
+
+Native bounded search is sufficiently fast in the prototype; further global
+search optimization is not the first implementation priority. Single-frame
+grids and blindly appending from the last target did not sustain a connected
+path on the recorded viewpoint sequence. Persistent terrain, stable anchors,
+actual progress association and replacement of invalid future suffixes are
+required. Lookahead must account for the camera's visible-ground range and
+configured units, not assume a fixed distance that has no observed support.
+
+Avoid refitting normals at every image point, rebuilding a concatenation of
+recent point clouds each frame, or reconstructing an all-history validation
+tree per update. Keep spatially indexed bounded evidence and validate the local
+route corridor. Preserve enough support/obstacle witnesses to retain geometric
+checks; indexing may narrow candidates but may not discard relevant negative
+observations. Indexed corridor extraction matched the original full-context
+geometry predicate in the tested cases.
+
+The refined same-frame prototype met the 100 ms CPU target. The temporal
+experiment did not yet meet that target or demonstrate reliable connected
+navigation. Its next development gate is a causal rolling-map replay with a
+validated current-ground start and connected suffix updates. End-to-end latency
+with the real models must be measured separately before claiming real time.
 
 ## Primary references
 
