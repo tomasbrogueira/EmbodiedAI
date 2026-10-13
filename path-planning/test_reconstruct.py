@@ -81,6 +81,16 @@ class ReconstructionAnchorTests(unittest.TestCase):
                 np.testing.assert_array_equal(result["images"], images.numpy())
                 np.testing.assert_array_equal(result["initialization_source_frames"], np.arange(count))
 
+    def test_official_batched_frame_flags_restore_original_order(self):
+        def run(model, ordered, args):
+            ids = ordered[:, 0, 0, 0].numpy().astype(int)
+            return {'frame_type': ids.astype(np.uint8)[None],
+                    'is_keyframe': (ids % 3 == 0)[None], 'images': ordered.numpy()}
+        result = self.run_wrapper(run)
+        np.testing.assert_array_equal(result['frame_type'], np.arange(17, dtype=np.uint8))
+        np.testing.assert_array_equal(result['is_keyframe'], np.arange(17) % 3 == 0)
+        np.testing.assert_array_equal(result['images'], self.images.numpy())
+
     def test_batched_input_reorders_frames_without_mixing_batches(self):
         images = torch.stack((self.images, self.images + 100))
         order = [0, 2, 5, 7, 9, 11, 14, 16, 1, 3, 4, 6, 8, 10, 12, 13, 15]

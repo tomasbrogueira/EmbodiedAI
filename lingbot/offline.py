@@ -32,6 +32,10 @@ def run_with_anchors(run, model, images, args):
                 'frame_type', 'is_keyframe', 'extrinsic', 'intrinsic', 'images'):
         if key in result:
             value = result[key]
+            # The official demo squeezes geometry but retains [1, N] flags.
+            # Normalize only known frame metadata; reject batched geometry.
+            if key in ('frame_type', 'is_keyframe') and isinstance(value, np.ndarray) and value.shape == (1, count):
+                value = value[0]
             if not isinstance(value, np.ndarray) or not value.ndim or value.shape[0] != count:
                 raise ValueError(f'Unexpected frame axis in {key}')
             result[key] = value[inverse]

@@ -6,9 +6,10 @@ were preserved. The implementation checkout is `/home/jovyan/EmbodiedAI-integrat
 
 ## Automated checks
 
-- 157 original planner tests passed, with the rebuilt native library enabled.
+- 158 planner tests passed, including the real-output frame-flag regression,
+  with the rebuilt native library enabled.
 - 44 original VLM/SAM plugin tests passed through compatibility entry points.
-- 19 integration tests passed: 220 total.
+- 19 integration tests passed: 221 total.
 - Python compilation and Git whitespace checks passed.
 - Live Viser service started without loading model weights and returned HTTP 200.
   The temporary service was stopped after verification.
@@ -35,12 +36,12 @@ no reconstruction, Qwen or SAM inference was performed.
 
 ## Limits of this validation
 
-Real GPU model inference was not rerun. Model environments/checkpoints are
-selected explicitly by the new runners and require hardware-specific validation.
-The available GPU partition during this check was approximately 10 GiB; the
-inherited three-resident-model live configuration was previously evaluated on
-larger hardware. Offline model stages execute sequentially and live sessions
-coordinate allocation through a shared lock.
+Real GPU model stages were subsequently tested on the 20 GB allocation; see
+[GPU validation](GPU_VALIDATION.md) for results, the adapter fix and the distinction
+between the default calibration outcome and diagnostic routing. The initial CPU
+checks used the earlier approximately 10 GiB partition. Offline model stages
+execute sequentially and live sessions coordinate allocation through a shared
+lock. Three-model persistent-session capacity was not stress tested.
 
 Continuous incremental replanning is not implemented; live analysis/search runs
 on the finalized immutable snapshot. Existing source-row, slope-aware clearance
