@@ -19,6 +19,22 @@ def row_at(points, x=0., y=0.):
 
 
 class CostMapTests(unittest.TestCase):
+    def test_parallel_costs_preserve_vetoes_boundaries_and_connections(self):
+        points = np.vstack((floor_points(), [.02, .01, .03], [0, 0, .00405]))
+        mask = np.r_[np.ones(len(points)-2, bool), False, False]
+        config = dict(radius=.081, support_mask=mask, max_neighbors=16)
+        for policy in ('enforce', 'disabled'):
+            with self.subTest(policy=policy):
+                slope = np.zeros(len(points)) if policy == 'enforce' else None
+                expected = build_cost_map(points, slope, [0,0,1], config | {'slope_policy':policy})
+                updates = []
+                actual = build_cost_map(points, slope, [0,0,1], config | {'slope_policy':policy},
+                    workers=4, progress=lambda done,total: updates.append((done,total)))
+                assert_array_equal(actual.cost, expected.cost)
+                assert_array_equal(actual.neighbours(row_at(points, .03)), expected.neighbours(row_at(points, .03)))
+                self.assertEqual(updates[-1][0], updates[-1][1])
+                self.assertEqual(updates, sorted(updates))
+
     def build(self, points, slope=None, reference=(0, 0, 1), **changes):
         config = dict(radius=.081, support_mask=np.ones(len(points), dtype=bool))
         config.update(changes)

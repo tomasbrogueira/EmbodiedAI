@@ -52,6 +52,9 @@ def main():
         parser.error('No MP4 videos found')
     if args.initial_run and not (args.initial_run/'status.json').is_file():
         parser.error('Initial saved run must contain status.json')
+    initial_config = {}
+    if args.initial_run and (args.initial_run/'config.json').is_file():
+        initial_config = json.loads((args.initial_run/'config.json').read_text())
     args.output_root = args.output_root.resolve()
     args.output_root.mkdir(parents=True, exist_ok=True)
     server = viser.ViserServer(host='0.0.0.0', port=args.port, label='Live VLM → SAM → LingBot map')
@@ -60,6 +63,10 @@ def main():
     server.gui.main_panel.dock_right()
     server.gui.main_panel.set_width(520)
     default = 'outdoor/IMG_5516.mp4' if 'outdoor/IMG_5516.mp4' in videos else next(iter(videos))
+    for name, path in videos.items():
+        if str(path) == initial_config.get('video_path'):
+            default = name
+            break
     presets = PromptPresets(args.output_root/'prompt_presets')
     saved_prompts = presets.list()
     tabs = server.gui.add_tab_group()
@@ -93,11 +100,12 @@ def main():
             prompt_notice = server.gui.add_markdown('Edit, then Start from Overview to test. Save a named preset to reuse it. '
                 'Keep JSON with a `prompts` list of concrete object names for SAM.')
     with tabs.add_tab('Settings'):
-        sam_enabled = server.gui.add_checkbox('SAM segmentation', initial_value=True)
-        support_enabled = server.gui.add_checkbox('Floor/ground support segmentation', initial_value=False)
-        slopes_enabled = server.gui.add_checkbox('Slope / steepness analysis', initial_value=False)
-        costs_enabled = server.gui.add_checkbox('Cost map', initial_value=False)
-        planner_enabled = server.gui.add_checkbox('Path planning (requires costs)', initial_value=False)
+        sam_enabled = server.gui.add_checkbox('SAM segmentation', initial_value=not initial_config.get('no_sam', False))
+        support_enabled = server.gui.add_checkbox('Floor/ground support segmentation', initial_value=bool(initial_config.get('support_prompt')))
+        slopes_enabled = server.gui.add_checkbox('Slope / steepness analysis', initial_value=initial_config.get('steepness', False))
+        costs_enabled = server.gui.add_checkbox('Cost map', initial_value=initial_config.get('cost_map', False))
+        planner_enabled = server.gui.add_checkbox('Path planning (requires costs)', initial_value=initial_config.get('plan', False))
+        analysis_workers = server.gui.add_number('Analysis CPU workers (0 = automatic)', initial_value=initial_config.get('analysis_workers', 0), min=0, max=32, step=1)
         reference_source = server.gui.add_dropdown('Reference/calibration evidence', options=['base_support', 'traversability'], initial_value='base_support')
         server.gui.add_markdown('Analysis runs on the finalized map. Slope off + planning on uses an explicit slope-disabled policy. Visibility and computation are separate.')
         sampling = server.gui.add_dropdown('Processing mode',
@@ -141,7 +149,7 @@ def main():
     def update_prompt_controls(running=False):
         manual = mode.value == 'Manual SAM prompts'
         mode.disabled = target.disabled = running
-        for control in (extra_enabled, extra_editor, sam_enabled, support_enabled, slopes_enabled, costs_enabled, planner_enabled, reference_source):
+        for control in (extra_enabled, extra_editor, sam_enabled, support_enabled, slopes_enabled, costs_enabled, planner_enabled, reference_source, analysis_workers):
             control.disabled = running
         sam_editor.visible = sam_notice.visible = manual
         vlm_folder.visible = mode.value == 'VLM proposals'
@@ -262,6 +270,7 @@ def main():
             parameters.extra_traversability_prompts = extra_prompts
             parameters.support_prompt = ('floor' if selection.value.startswith('indoor/') else 'ground') if support_enabled.value else None
             parameters.steepness, parameters.cost_map, parameters.plan = slopes_enabled.value, costs_enabled.value, planner_enabled.value
+            parameters.analysis_workers = int(analysis_workers.value)
             parameters.reference_source = parameters.calibration_source = reference_source.value
             cancel.clear()
             def process_video():
@@ -371,10 +380,11 @@ def main():
                     cloud = server.scene.add_point_cloud('/live_map',points=points,colors=colors,
                         point_size=extent*.001,precision='float32',point_shape='circle')
                 display_mtime=mtime
-            if data.get('status') == 'complete' and data.get('outputs', {}).get('map') and finalized['directory'] != directory:
+            view_key = (directory, tuple(sorted(data.get('outputs', {}).items())))
+            if data.get('status') in ('analysing', 'complete') and data.get('outputs', {}).get('map') and finalized['directory'] != view_key:
                 from visualizer.integrated import load_view
                 finished = load_view(directory)
-                finalized.update(directory=directory, view=finished)
+                finalized.update(directory=view_key, view=finished)
                 colour_mode.options = list(finished['modes'])
                 colour_mode.value = 'Cost map' if 'Cost map' in finished['modes'] else 'Traversability'
                 cloud = server.scene.add_point_cloud('/live_map', points=finished['points'],
@@ -387,7 +397,9 @@ def main():
                         colors=(240, 0, 220), line_width=3.)
                     finalized['route'].visible = route_visible.value
                 legend.content = ('Green: positive support evidence. Red: non-traversable veto. '
-                    'Steepness: 0–90°. Route: verified against this snapshot.\n\n' + '\n\n'.join(finished['notes']))
+                    'Steepness: 0–90°. Route: verified against this snapshot.\n\n'
+                    + ('Path planning: ' + finished['report']['status'] + '\n\n' if finished['report'] else '')
+                    + '\n\n'.join(finished['notes']))
             pose = data.get('camera_pose')
             if pose:
                 pose_overlay.update(pose,extent)

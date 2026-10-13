@@ -47,6 +47,22 @@ class Segmenter:
 
 
 class IntegrationTests(unittest.TestCase):
+    @unittest.skipUnless(NATIVE.exists(), 'Compile native search first')
+    def test_failed_native_sample_still_searches_all_original_rows(self):
+        points = self.points.reshape(-1, 3).astype(float)
+        cm = build_cost_map(points, None, [0,0,1], dict(radius=.16,
+            support_mask=np.ones(len(points),bool), slope_policy='disabled'))
+        start, goal = 14*28+3, 14*28+25
+        expected = find_path(points,cm,start,goal)
+        with patch('path_planner.routes._native_bound', return_value=None) as sampled:
+            actual = exact_route(cm,start,goal,np.array([start,goal]),NativeSearch(NATIVE),
+                find_path,lambda *a,**k:None,allow_partial=True)
+        sampled.assert_called_once()
+        self.assertEqual(actual.status, expected.status)
+        self.assertAlmostEqual(actual.total_cost, expected.total_cost)
+        for first,second in zip(actual.ids[:-1],actual.ids[1:]):
+            self.assertTrue(cm._connected(first,second))
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)

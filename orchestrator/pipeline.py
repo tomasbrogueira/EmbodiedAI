@@ -167,7 +167,7 @@ def run_pipeline(configuration, command_runner=None):
             verify(snapshot, 'map')
             remember('map', snapshot)
         from orchestrator.analysis import steepness, costs, route
-        common = {key: analysis[key] for key in ('reference', 'radius', 'reference_source') if key in analysis}
+        common = {key: analysis[key] for key in ('reference', 'radius', 'reference_source', 'workers') if key in analysis}
         slope_dir = Path(inputs['steepness']) if inputs.get('steepness') else None
         if analysis['steepness'] == 'compute':
             slope_dir = out / 'steepness'

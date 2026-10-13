@@ -165,6 +165,21 @@ and route switches. Freeze computation settings at Start; visibility/color
 controls can change during viewing. Models are reusable between healthy runs;
 unload releases the allocation lock and GPU memory.
 
+CPU analysis uses up to 12 threads automatically, limited by the container's
+CPU allowance. Set **Analysis CPU workers** to 1 for serial execution, or select
+an explicit count. Standalone steepness/cost CLIs accept `--workers`; the stream
+accepts `--analysis-workers`, and composed JSON configurations accept
+`analysis.workers` (0 means automatic). Independent frames and node-cost batches
+run concurrently; neighbourhoods, original rows and geometric checks are retained.
+The viewer shows the current analysis stage and completed-row percentage, and
+exposes finished steepness/cost layers while route certification continues.
+
+The native route backend also finds its preliminary feasible bound in C++, using
+all original support/obstacle evidence. A sampled failure cannot establish that
+the full graph is disconnected. The final shortest-path search still uses every
+original finite-cost row allowed by the certified bound. See
+[performance validation](PERFORMANCE_VALIDATION.md) for measured timings.
+
 The causal CLI provides the same features:
 
 ```bash

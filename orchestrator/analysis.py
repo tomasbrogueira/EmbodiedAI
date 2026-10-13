@@ -5,6 +5,11 @@ from orchestrator.artifacts import verify, publish, save_array, write_json, code
 from orchestrator.semantics import POSITIVE, NEGATIVE
 from path_planner.cost_map import build_cost_map, _settings
 from path_planner.slope import estimate_slope
+from path_planner.parallel import worker_count
+
+
+def _progress(callback, stage):
+    return None if callback is None else lambda done, total: callback(stage, done, total)
 
 
 def load_snapshot(path):
@@ -118,7 +123,9 @@ def reference_and_radius(receipt, data, reference=None, radius=None, source='bas
     return reference / np.linalg.norm(reference), float(radius), report | {'source': source}
 
 
-def steepness(snapshot, output, *, reference=None, radius=None, reference_source='base_support'):
+def steepness(snapshot, output, *, reference=None, radius=None, reference_source='base_support',
+              workers=0, progress=None):
+    workers = worker_count(workers)
     receipt, data = load_snapshot(snapshot)
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
@@ -128,14 +135,17 @@ def steepness(snapshot, output, *, reference=None, radius=None, reference_source
     if normal is None:
         return publish(output, 'steepness', metadata | {'status': 'missing_reference'})
     values, quality = estimate_slope(data['points'], normal, {'radius': radius},
-                                     frame_ids=data['frame_ids'], return_quality=True)
+                                     frame_ids=data['frame_ids'], return_quality=True,
+                                     workers=workers, progress=_progress(progress, 'steepness'))
     for key, array in dict(reference=normal, slope=values, quality=quality).items():
         save_array(output / f'{key}.npy', array)
     return publish(output, 'steepness', metadata | {'status': 'ok', 'reference': normal})
 
 
 def costs(snapshot, output, *, slope_policy='enforce', slopes=None, reference=None, radius=None,
-          reference_source='base_support', clearance_height=None, calibration_source='base_support', settings=None):
+          reference_source='base_support', clearance_height=None, calibration_source='base_support', settings=None,
+          workers=0, progress=None):
+    workers = worker_count(workers)
     from path_planner.recording_endpoints import select_endpoint
     from path_planner.routes import associate
     from orchestrator.batch.dataset_prepare import camera_clearance
@@ -176,7 +186,8 @@ def costs(snapshot, output, *, slope_policy='enforce', slopes=None, reference=No
         baseline_mask = data.get('base_support_mask') if calibration_source == 'base_support' else data['support_mask']
         calibration = dict(reason='missing_clearance_calibration', source=calibration_source)
         if baseline_mask is not None:
-            baseline = build_cost_map(data['points'], slope_values, normal, config | {'support_mask': baseline_mask})
+            baseline = build_cost_map(data['points'], slope_values, normal, config | {'support_mask': baseline_mask},
+                                      workers=workers, progress=_progress(progress, 'clearance calibration'))
             poses = associate(baseline.points, baseline.cost, baseline_mask, baseline.reference,
                               baseline.config, data['cameras'], data['timestamps'], select_endpoint)
             calibration = camera_clearance(poses, radius) | {'source': calibration_source}
@@ -191,7 +202,8 @@ def costs(snapshot, output, *, slope_policy='enforce', slopes=None, reference=No
         calibration = dict(reason='ok', source='supplied', height=clearance_height)
     cm = build_cost_map(data['points'], slope_values, normal,
                         config | {'support_mask': data['support_mask'], 'obstacle_mask': data['obstacle_mask'],
-                                  'clearance_height': clearance_height})
+                                  'clearance_height': clearance_height},
+                        workers=workers, progress=_progress(progress, 'cost map'))
     save_array(output / 'cost.npy', cm.cost)
     save_array(output / 'reference.npy', cm.reference)
     settings = {k: v for k, v in cm.config.items() if not k.endswith('_mask')}
@@ -200,7 +212,7 @@ def costs(snapshot, output, *, slope_policy='enforce', slopes=None, reference=No
     return publish(output, 'costs', metadata)
 
 
-def route(cost_directory, output, *, start=None, goal=None, library=None):
+def route(cost_directory, output, *, start=None, goal=None, library=None, progress=None):
     from path_planner.routes import restore_cost_map, associate, select_segment, exact_route, NativeSearch
     from path_planner.recording_endpoints import select_endpoint
     from path_planner.planner import find_path
@@ -248,8 +260,12 @@ def route(cost_directory, output, *, start=None, goal=None, library=None):
                 report['status'] = invalid
             else:
                 if library is not None:
-                    result = exact_route(cm, start, goal, np.asarray(sorted({start, goal})), NativeSearch(library),
-                                         find_path, lambda *a, **k: None, allow_partial=True)
+                    associated = sorted({start, goal} | {p['id'] for p in poses if p['reason'] == 'ok'})
+                    def search_progress(stage, **details):
+                        if progress is not None:
+                            progress('path planning: ' + stage.replace('_', ' '), 0, 1)
+                    result = exact_route(cm, start, goal, np.asarray(associated), NativeSearch(library),
+                                         find_path, search_progress, allow_partial=True)
                 else:
                     from path_planner.planner import find_partial_path
                     result = find_partial_path(cm.points, cm, start, goal)

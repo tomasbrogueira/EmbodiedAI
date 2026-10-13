@@ -242,12 +242,57 @@ def route_cost(cm, ids):
     return float(np.sum(length * (cm.cost[a] / 2 + cm.cost[b] / 2)))
 
 
-def feasible_bound(cm, finite_rows, associated_ids, start, goal, update):
+def _native_bound(cm, rows, start, goal, native):
+    """Search a sample using full-map feasibility; independently check its edges."""
+    x, costs = cm.points[rows], cm.cost[rows]
+    source, target = np.searchsorted(rows, [start, goal])
+    cmin = float(np.min(costs))
+    extent = np.linalg.norm(np.max(np.abs(x - x[target]), axis=0))
+    upper = float((np.longdouble(max(1, len(rows)-1)) * cm.config['connection_radius']
+                   * np.max(costs) + np.longdouble(cmin) * extent)
+                  * (1 + 4 * len(rows) * np.finfo(float).eps))
+    banned = set()
+    for _ in range(128):
+        status, distance, previous = native(x, costs, cm.reference,
+            cm.config['connection_radius'], cm.config['max_slope'], cmin, upper,
+            int(source), int(target), banned, max_gap=cm.config['max_gap'],
+            obstacle_margin=cm.config['obstacle_margin'], clearance_height=cm.config['clearance_height'])
+        if not status:
+            return None
+        local, row = [int(target)], int(target)
+        while row != source:
+            row = int(previous[row])
+            if row < 0 or len(local) > len(rows):
+                raise RuntimeError('Invalid sampled native predecessor chain')
+            local.append(row)
+        local = np.asarray(local[::-1], dtype=np.int64)
+        ids = rows[local]
+        invalid = [(min(int(a),int(b)), max(int(a),int(b)))
+                   for a,b,u,v in zip(local[:-1],local[1:],ids[:-1],ids[1:])
+                   if not edge_allowed(cm,u,v)]
+        if not invalid:
+            return ids
+        before = len(banned)
+        banned.update(invalid)
+        if len(banned) == before:
+            raise RuntimeError('Sampled native search reused an excluded edge')
+    return None
+
+
+def feasible_bound(cm, finite_rows, associated_ids, start, goal, update, native=None):
     """A sampled subgraph supplies only an upper bound, never a no-path conclusion."""
     for size in (36000, 72000, 144000):
         sampled = finite_rows[np.linspace(0, len(finite_rows) - 1,
                                          min(size, len(finite_rows)), dtype=np.int64)]
         rows = np.union1d(sampled, associated_ids)
+        if native is not None:
+            update('finding_feasible_bound', sampled_rows=len(rows), backend='native')
+            ids = _native_bound(cm, rows, start, goal, native)
+            if ids is not None:
+                return ids, route_cost(cm, ids)
+            if len(sampled) == len(finite_rows):
+                break
+            continue
         x, costs = cm.points[rows], cm.cost[rows]
         tree = cKDTree(x)
         radius = cm.config['connection_radius']
@@ -372,7 +417,8 @@ def exact_route(cm, start, goal, associated_ids, native, find_path, update,
     feasible_native = getattr(native, 'supports_feasibility', False)
     if feasible_native:
         native.prepare_map(cm, rows)
-    bound_ids, upper = feasible_bound(cm, rows, associated_ids, start, goal, update)
+    bound_ids, upper = feasible_bound(cm, rows, associated_ids, start, goal, update,
+                                    native=native if isinstance(native, NativeSearch) else None)
     has_bound = upper is not None
     cmin = float(np.min(cm.cost[rows]))
     if has_bound:

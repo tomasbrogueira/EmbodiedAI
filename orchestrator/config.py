@@ -21,7 +21,7 @@ def resolve(value):
     defaults = {
         'geometry': dict(mode='off', policy='offline_uniform_anchors'),
         'vlm': dict(mode='off', target='non_traversable'),
-        'analysis': dict(steepness='off', costs='off', reference_source='base_support', calibration_source='base_support'),
+        'analysis': dict(steepness='off', costs='off', reference_source='base_support', calibration_source='base_support', workers=0),
         'planning': dict(enabled=False, slope_policy=None),
         'visualizer': dict(enabled=False, port=8094, host='127.0.0.1'),
         'projection': dict(enabled=True, frame_step=2, pixel_step=1, min_depth_conf=2.5, max_depth=25.),
@@ -30,6 +30,8 @@ def resolve(value):
         if not isinstance(cfg.get(key, {}), dict):
             raise ValueError(f'{key} must be an object')
         cfg[key] = default | cfg.get(key, {})
+    from path_planner.parallel import worker_count
+    worker_count(cfg['analysis']['workers'])
     if cfg['geometry']['policy'] not in ('offline_uniform_anchors', 'causal_stream'):
         raise ValueError('Unknown reconstruction policy')
     if cfg['geometry']['mode'] == 'compute' and cfg['geometry']['policy'] == 'causal_stream':

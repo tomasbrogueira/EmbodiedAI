@@ -2,6 +2,7 @@
 from numbers import Integral, Real
 import numpy as np
 from scipy.spatial import cKDTree
+from path_planner.parallel import completed, worker_count
 
 
 def _settings(config):
@@ -68,7 +69,8 @@ def _fit_patches(patches, valid, min_samples=6):
     return normals, quality
 
 
-def estimate_slope(points, n_ref, config, *, frame_ids=None, return_quality=False):
+def estimate_slope(points, n_ref, config, *, frame_ids=None, return_quality=False,
+                   workers=1, progress=None):
     """Return radians[N], optionally (radians[N], quality[N]), in original row order.
 
     Fit up to neighbors distinct same-frame positions within radius, with one
@@ -77,6 +79,7 @@ def estimate_slope(points, n_ref, config, *, frame_ids=None, return_quality=Fals
     traversability certificate. Undefined normals have slope NaN and quality 0.
     """
     s = _settings(config)
+    workers = worker_count(workers)
     points = np.asarray(points)
     if points.ndim != 2 or points.shape[1] != 3 or points.dtype.kind not in 'iuf':
         raise ValueError('points must be a real array with shape (N,3)')
@@ -95,11 +98,10 @@ def estimate_slope(points, n_ref, config, *, frame_ids=None, return_quality=Fals
     slope, quality = np.full(len(points), np.nan), np.zeros(len(points))
     finite = np.flatnonzero(np.isfinite(points).all(axis=1))
     labels = np.zeros(len(finite), dtype=int) if frame_ids is None else frame_ids[finite]
-    for label in np.unique(labels):
-        rows = finite[labels == label]
+    def fit(rows):
         unique, inverse = np.unique(points[rows].astype(float), axis=0, return_inverse=True)
         if len(unique) < s['min_samples']:
-            continue
+            return rows, np.full(len(rows), np.nan), np.zeros(len(rows))
         tree = cKDTree(unique)
         angles, scores = np.full(len(unique), np.nan), np.zeros(len(unique))
         k = min(s['neighbors'], len(unique))
@@ -113,5 +115,14 @@ def estimate_slope(points, n_ref, config, *, frame_ids=None, return_quality=Fals
             normal, score = _fit_patches(patches, valid, s['min_samples'])
             angles[start:start+len(query)] = np.arccos(np.clip(np.abs(normal @ ref), 0, 1))
             scores[start:start+len(query)] = score
-        slope[rows], quality[rows] = angles[inverse], scores[inverse]
+        return rows, angles[inverse], scores[inverse]
+    jobs = (finite[labels == label] for label in np.unique(labels))
+    done = len(points) - len(finite)
+    if progress is not None:
+        progress(done, len(points))
+    for rows, angles, scores in completed(fit, jobs, workers):
+        slope[rows], quality[rows] = angles, scores
+        done += len(rows)
+        if progress is not None:
+            progress(done, len(points))
     return (slope, quality) if return_quality else slope

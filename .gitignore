@@ -38,3 +38,4 @@ htmlcov/
 /path-planning/*.lock
 /path-planning/*.npz
 /path-planning/*.npy
+/data/vlm_maps/live_demo/

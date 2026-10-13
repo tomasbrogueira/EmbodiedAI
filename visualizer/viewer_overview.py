@@ -44,6 +44,11 @@ def overview_html(data, directory=None, roles=(), message='', error=None):
     loading = data.get('loading_model')
     if loading:
         state += ' · loading '+escape(loading)
+    analysis = data.get('analysis_progress')
+    if analysis and data.get('status') == 'analysing':
+        state += ' · '+escape(analysis['stage'])
+        if analysis['total'] > 1:
+            state += f' · {100 * analysis["completed"] / analysis["total"]:.0f}%'
     queries = ', '.join(data.get('prompts') or data.get('manual_sam_prompts') or []) or 'none'
     saved = '' if directory is None else str(directory)
     details = [
@@ -52,6 +57,7 @@ def overview_html(data, directory=None, roles=(), message='', error=None):
         ('Models', ', '.join(roles)+' · kept loaded' if roles else 'not loaded / loading'),
         ('Prompt', mode+' · '+str(data.get('vlm_prompt_name', 'Built-in default'))),
         ('SAM queries', queries),
+        ('Path planning', str(data.get('planning_status', 'pending' if analysis else 'not started'))),
         ('Relative position', vector('relative_position')+' · model units'),
         ('Viewing direction', vector('view_direction_world')),
         ('Relative rotation', vector('relative_rotation_degrees')+' °'),

@@ -485,19 +485,28 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
                 raise ValueError('VLM proposal failures leave incomplete required evidence; map retained, planning withheld')
             from orchestrator.projection import build_snapshot
             from orchestrator.analysis import steepness, costs, route
+            def analysis_progress(stage, done=0, total=1):
+                if stop_event is not None and stop_event.is_set():
+                    raise RunCancelled()
+                state.update(status='analysing', analysis_progress=dict(stage=stage, completed=done, total=total))
+                status()
+            analysis_progress('saving finalized map')
             snapshot = args.output_dir / 'map'
             build_snapshot(args.output_dir / 'predictions', snapshot, semantic_dir=args.output_dir / 'masks',
                 frame_step=1, selected_frames=semantic_frames, source_fps=state['source_fps'], reconstruction_policy='causal_stream')
             state['outputs'] = {'map': str(snapshot)}
             options = dict(reference=getattr(args, 'reference', None), radius=getattr(args, 'radius', None),
-                           reference_source=getattr(args, 'reference_source', 'base_support'))
+                           reference_source=getattr(args, 'reference_source', 'base_support'),
+                           workers=getattr(args, 'analysis_workers', 0), progress=analysis_progress)
             slope_dir = None
             if args.steepness:
                 slope_dir = args.output_dir / 'steepness'
+                analysis_progress('steepness')
                 steepness(snapshot, slope_dir, **options)
                 state['outputs']['steepness'] = str(slope_dir)
             if args.cost_map or args.plan:
                 cost_dir = args.output_dir / 'costs'
+                analysis_progress('cost map')
                 costs(snapshot, cost_dir, slopes=slope_dir,
                     slope_policy='enforce' if args.steepness else 'disabled',
                     clearance_height=getattr(args, 'clearance_height', None),
@@ -506,8 +515,12 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
                 if args.plan:
                     route_dir = args.output_dir / 'route'
                     native = ROOT / 'path-planning/corridor_astar_feasible.so'
-                    route(cost_dir, route_dir, library=native if native.exists() else None)
+                    analysis_progress('path planning')
+                    planned = route(cost_dir, route_dir, library=native if native.exists() else None,
+                                    progress=analysis_progress)
+                    state['planning_status'] = planned['metadata']['status']
                     state['outputs']['route'] = str(route_dir)
+            analysis_progress('finished', 1, 1)
         state['status'] = 'complete'
     except RunCancelled:
         state['status'] = 'stopped'
@@ -562,6 +575,7 @@ def parse_args(argv=None):
     parser.add_argument('--steepness', action='store_true', help='Analyze finalized snapshot; independent of route search')
     parser.add_argument('--cost-map', action='store_true', help='Build costs after completion without requiring route search')
     parser.add_argument('--plan', action='store_true', help='Build costs and certify a route after completion')
+    parser.add_argument('--analysis-workers', type=int, default=0, help='CPU analysis threads; 0 selects up to 12 automatically')
     parser.add_argument('--reference', type=float, nargs=3)
     parser.add_argument('--radius', type=float)
     parser.add_argument('--clearance-height', type=float)
@@ -604,6 +618,11 @@ def parse_args(argv=None):
     parser.add_argument('--display-points', type=int, default=200_000)
     parser.add_argument('--display-interval', type=float, default=.5)
     args = parser.parse_args(argv)
+    from path_planner.parallel import worker_count
+    try:
+        worker_count(args.analysis_workers)
+    except ValueError as error:
+        parser.error(str(error))
     if args.frame_count < 0 or args.frame_count == 1:
         parser.error('Use frame-count 0 for FPS sampling, or at least 2 for offline frame-count mode')
     if args.frame_count and (args.realtime or args.max_frames):

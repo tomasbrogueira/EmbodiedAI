@@ -4,6 +4,7 @@ from numbers import Integral, Real
 
 import numpy as np
 from scipy.spatial import cKDTree
+from path_planner.parallel import completed, worker_count
 
 
 def obstacle_distance_squared(points, a, b, reference, height):
@@ -69,7 +70,8 @@ def _settings(config):
 class CostMap:
     """Aligned costs; inputs must remain unchanged while this object is used."""
 
-    def __init__(self, points, slope, reference, settings):
+    def __init__(self, points, slope, reference, settings, *, workers=1, progress=None):
+        workers = worker_count(workers)
         self.points, self.slope, self.reference, self.config = points, slope, reference, settings
         self.cost = np.full(len(points), np.inf)
         finite = np.isfinite(points).all(axis=1)
@@ -87,8 +89,11 @@ class CostMap:
         support = cKDTree(np.unique(points[self.eligible], axis=0))
         eligible_rows = np.flatnonzero(self.eligible)
         batch_size = settings["max_neighbors"]
-        for start in range(0, len(eligible_rows), batch_size):
-            rows = eligible_rows[start:start + batch_size]
+        # Materialize the lazy Python view before threads read it concurrently.
+        if workers > 1:
+            self.overhead.tree
+        def evaluate(rows):
+            count = len(rows)
             distance = support.query(points[rows], k=[settings["min_support"]],
                                      distance_upper_bound=np.nextafter(settings["radius"], np.inf))[0][:, 0]
             rows = rows[distance <= settings["radius"]]
@@ -99,10 +104,21 @@ class CostMap:
             rows, clearance = rows[keep], clearance[keep]
             slope_penalty = (settings["w_slope"] * (slope[rows] / settings["max_slope"]) ** 2
                              if settings.get("slope_policy", "enforce") == "enforce" else 0.)
-            self.cost[rows] = (1 + slope_penalty
-                               + settings["w_clearance"] * np.exp(
-                                   -np.minimum(clearance, settings["clearance_scale"])
-                                   / settings["clearance_scale"]))
+            values = (1 + slope_penalty
+                      + settings["w_clearance"] * np.exp(
+                          -np.minimum(clearance, settings["clearance_scale"])
+                          / settings["clearance_scale"]))
+            return rows, values, count
+        jobs = (eligible_rows[start:start + batch_size]
+                for start in range(0, len(eligible_rows), batch_size))
+        done = 0
+        if progress is not None:
+            progress(done, len(eligible_rows))
+        for rows, values, count in completed(evaluate, jobs, workers):
+            self.cost[rows] = values
+            done += count
+            if progress is not None:
+                progress(done, len(eligible_rows))
         self.support = cKDTree(np.unique(points[np.isfinite(self.cost)], axis=0))
 
     def _index_overhead(self):
@@ -225,7 +241,7 @@ class CostMap:
         return np.asarray(sorted(result), dtype=np.intp)
 
 
-def build_cost_map(points, slope, n_ref, config):
+def build_cost_map(points, slope, n_ref, config, *, workers=1, progress=None):
     """Build a relative surface map using the existing slope radius and reference.
 
     ``radius`` is required in cloud units; ``support_mask`` labels original
@@ -265,4 +281,5 @@ def build_cost_map(points, slope, n_ref, config):
         reference = reference.astype(float)
         reference /= np.max(np.abs(reference))
         reference /= np.linalg.norm(reference)
-    return CostMap(points.astype(float, copy=False), slope, reference, settings)
+    return CostMap(points.astype(float, copy=False), slope, reference, settings,
+                   workers=workers, progress=progress)

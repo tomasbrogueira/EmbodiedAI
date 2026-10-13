@@ -14,6 +14,7 @@ def main():
         stage.add_argument('--reference', type=float, nargs=3)
         stage.add_argument('--radius', type=float)
         stage.add_argument('--reference-source', choices=['base_support', 'traversability'], default='base_support')
+        stage.add_argument('--workers', type=int, default=0, help='CPU analysis threads; 0 selects up to 12 automatically')
         if name == 'costs':
             stage.add_argument('--slope-policy', choices=['enforce', 'disabled'], default='enforce')
             stage.add_argument('--slopes', type=Path)
