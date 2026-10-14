@@ -1,11 +1,13 @@
 # Implementation plan: framewise traversability and a moving local goal
 
-This is a proposed new backend, not an implemented or benchmarked real-time
-feature. The agreed live behaviour is to choose a reachable traversable point
+The initial backend is now integrated into the visualizer; see
+[LIVE_LOCAL_PLANNING.md](LIVE_LOCAL_PLANNING.md) for controls and limits. Focused
+checks were run, but the user will test the complete model pipeline. It is not
+yet an end-to-end verified real-time feature. The agreed live behaviour is to choose a reachable traversable point
 ahead of the camera and update its route as processed frames arrive. No final
-destination or end-of-recording analysis is required for this mode. Application
-code and the running server are unchanged; this document is the implementation
-proposal. The existing exact point-cloud backend remains available offline.
+destination or end-of-recording analysis is required for this mode. This document
+retains the architecture and acceptance targets. The existing exact point-cloud
+backend remains available offline.
 
 ## Required live behaviour
 
@@ -487,6 +489,37 @@ experiment did not yet meet that target or demonstrate reliable connected
 navigation. Its next development gate is a causal rolling-map replay with a
 validated current-ground start and connected suffix updates. End-to-end latency
 with the real models must be measured separately before claiming real time.
+
+## Persistent-path benchmark follow-up
+
+The [persistent-path test](PERSISTENT_PATH_BENCHMARKS.md) passed controlled
+obstacle/turn suffix replanning in both slope modes, preserving shared anchors
+and rejecting invalid joins. On the 56-frame recording it obtained 32 tail
+extensions with slopes off and three with slopes on; the current-ground policy
+obtained 12 and one suffix replans respectively. Many updates remained
+unavailable, and successful slope-enabled temporal updates reached 357 ms CPU.
+The recording does not provide controlled execution feedback. These results
+support stable source-aware terrain and suffix replacement, but do not pass the
+live navigation gate. Prioritize validated progress/ground association, anchor
+witness lifecycle and bounded raw validation/index work before a real-model
+live replay. Apply clearance inflation once after fusion and keep base costs
+separate from slope overlays. Tail-relative demo goals must not be used as a
+substitute for the requested camera-relative forward goal policy.
+
+## GPU benchmark decision
+
+The [GPU validation benchmark](GPU_PLANNING_BENCHMARKS.md) matched all tested
+CPU geometry decisions. Resident validation of a 261k-row, 93-vertex accepted
+candidate ran at 27.9 ms median / 40.6 ms P95 during paced inference by all three
+models. GPU validation is an optional backend within `path_planner`; retain CPU
+fallback for light workloads and unavailable CUDA. Preserve distinct support
+counting, negative vetoes, support-gap bounds and swept obstacle clearance.
+Keep source-aware witness indexes resident, and measure their full bounded-map
+update/expiry cost before integration. Native bounded search stays on CPU
+initially. Inference contention can erase small-case GPU gains, so validate
+scheduling and cache budgets with the actual perception pipeline. GPU acceleration
+does not satisfy the remaining continuity, progress, calibration and end-to-end
+latency gates. A whole-project Rust rewrite is not an implementation prerequisite.
 
 ## Primary references
 

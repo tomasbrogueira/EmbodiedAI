@@ -94,3 +94,37 @@ def estimate_floor_reference(frames):
     normal = normals.mean(axis=0)
     normal /= np.linalg.norm(normal)
     return normal, report | {"reason": "ok"}
+
+
+def estimate_local_floor_reference(frames, scene_report=None):
+    """Fallback from locally planar near-field ground in three distinct frames.
+
+    Roughness/curvature over a whole image need not prevent identifying a local
+    reference. Each crop retains the original support, plane and consistency
+    requirements; multiple crops of one frame never count as multiple frames.
+    """
+    rng=np.random.default_rng(0);normals=[];reports=[];seen=set()
+    scene={int(f['id']):f for f in (scene_report or {}).get('frames',[])}
+    for frame in islice(frames,MAX_FRAMES):
+        identity=int(frame['id'])
+        if identity in seen:continue
+        seen.add(identity);mask=np.asarray(frame['floor_mask'],bool);h,w=mask.shape
+        y,x=np.where(mask&np.isfinite(frame['points']).all(-1));chosen=None;attempts=[]
+        if len(y):
+            size=min(64,h,w)
+            for fraction in (.85,.6,.35):
+                cy=int(np.quantile(y,fraction));near=abs(y-cy)<size//4
+                cx=int(np.median(x[near]));y0=int(np.clip(cy-size//2,0,h-size));x0=int(np.clip(cx-size//2,0,w-size))
+                local=dict(frame,points=frame['points'][y0:y0+size,x0:x0+size],floor_mask=mask[y0:y0+size,x0:x0+size])
+                normal,info=_fit_frame(local,rng);attempts.append(info['reason'])
+                if normal is not None:
+                    chosen=info|dict(crop=[x0,y0,x0+size,y0+size],scene_spacing=scene.get(identity,{}).get('spacing',info['spacing']))
+                    normals.append(normal);break
+        reports.append(chosen or dict(id=identity,reason='no_supported_local_plane',attempts=attempts))
+    report=dict(frames=reports,method='local ground patches',max_disagreement_degrees=None)
+    if len(normals)<3:return None,report|dict(reason='insufficient_reference_frames')
+    normals=np.asarray(normals);dots=np.clip(normals@normals.T,-1,1)
+    disagreement=float(np.degrees(np.arccos(abs(dots))).max());report['max_disagreement_degrees']=disagreement
+    if disagreement>MAX_DISAGREEMENT_DEGREES or np.any(dots<0):return None,report|dict(reason='inconsistent_reference_frames')
+    normal=normals.mean(0);normal/=np.linalg.norm(normal)
+    return normal,report|dict(reason='ok')

@@ -19,7 +19,7 @@ def formatted(value, unit='', digits=2):
 
 def overview_html(data, directory=None, roles=(), message='', error=None):
     pose = data.get('camera_pose') or {}
-    mode = 'Manual SAM' if data.get('proposal_mode') == 'manual' else 'VLM proposals'
+    mode = 'Manual SAM' if data.get('proposal_mode') == 'manual' else ('SAM only' if data.get('vlm_skipped') else 'VLM proposals')
     metrics = [
         ('Video time', formatted(data.get('source_time', data.get('last_geometry_source_time')), ' s')),
         ('Elapsed', formatted(data.get('wall_seconds'), ' s')),
@@ -35,6 +35,10 @@ def overview_html(data, directory=None, roles=(), message='', error=None):
         ('First map', formatted(data.get('first_map_wall_seconds'), ' s')),
         ('VLM calls', formatted(data.get('vlm_calls'))),
     ]
+    local=data.get('framewise_planning')
+    if local:
+        metrics.extend([('Local planning',formatted(local.get('processing_ms'),' ms',digits=0)),
+                        ('Traversable cells',formatted(local.get('eligible_cells')))])
     cells = ''.join(f'<div class="overview-metric"><span>{label}</span><strong>{value}</strong></div>'
                     for label, value in metrics)
     def vector(key):

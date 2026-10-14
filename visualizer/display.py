@@ -1,6 +1,19 @@
 """Display reservoir; never used to reduce the planning graph."""
 import numpy as np
 
+def planning_view(data,surface,show_raw=False):
+    """Preserve the accumulated map; optionally hide typed lower ground only.
+
+    Current-frame geometry must never replace reconstruction history. Ground
+    cleanup for planning is independent of this reversible display filter.
+    """
+    from path_planner.surface_layers import obsolete_lower
+    points,colors=data['points'],data['colors']
+    if show_raw or not surface.get('layer_filter',False):return points,colors
+    positive=(colors==[30,210,90]).all(1);negative=(colors==[255,0,0]).all(1)
+    keep=~(obsolete_lower(points,surface)&positive)|negative
+    return points[keep],colors[keep]
+
 class DisplayBuffer:
     """Uniform random-priority reservoir over the whole accumulated map."""
     def __init__(self, max_points=200_000):

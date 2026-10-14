@@ -1,0 +1,92 @@
+{
+  "source_normals": {
+    "raw_points": 49626,
+    "raw_obstacle_points": 830,
+    "route_vertices": 29,
+    "grade_failed_edges": [],
+    "support_gap_failed_edges": [],
+    "obstacle_failed_edges": [],
+    "support_count_failed_nodes": []
+  },
+  "source_normals_without_grid_edge_grade": {
+    "raw_points": 4363281,
+    "raw_obstacle_points": 225716,
+    "route_vertices": 277,
+    "grade_failed_edges": [
+      14,
+      20,
+      72,
+      134,
+      137,
+      143,
+      145,
+      146,
+      147,
+      148,
+      150,
+      154,
+      158,
+      160,
+      161,
+      162,
+      163,
+      165,
+      166,
+      167,
+      170,
+      171,
+      172,
+      173,
+      176,
+      180,
+      182,
+      186,
+      188,
+      192,
+      194,
+      200
+    ],
+    "support_gap_failed_edges": [
+      14,
+      20,
+      153,
+      175,
+      198
+    ],
+    "obstacle_failed_edges": [
+      14,
+      20,
+      26,
+      143,
+      209,
+      210,
+      267,
+      272,
+      273
+    ],
+    "support_count_failed_nodes": []
+  },
+  "slopes_disabled": {
+    "raw_points": 4365009,
+    "raw_obstacle_points": 227009,
+    "route_vertices": 274,
+    "grade_failed_edges": [],
+    "support_gap_failed_edges": [
+      5,
+      14,
+      155,
+      157
+    ],
+    "obstacle_failed_edges": [
+      5,
+      14,
+      15,
+      30,
+      31,
+      147,
+      269,
+      270
+    ],
+    "support_count_failed_nodes": []
+  }
+}

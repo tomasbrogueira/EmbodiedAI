@@ -205,7 +205,9 @@ class RunCancelled(Exception):
 
 
 def run(args, model_session=None, stop_event=None, output_stream=None):
-    for key, value in dict(vlm_target='non_traversable', steepness=False, cost_map=False, plan=False, no_vlm=False, no_sam=False).items():
+    for key, value in dict(vlm_target='non_traversable', steepness=False, cost_map=False, plan=False, no_vlm=False, no_sam=False,
+                          planning_backend='exact_points', validation_backend='auto', start_policy='strict',
+                          lookahead=12.,auto_lookahead=True,filter_lower_layers=True,replan_layer_changes=True,replan_disconnected=True,planning_budget_ms=40.,no_dense_recording=False).items():
         if not hasattr(args, key): setattr(args, key, value)
     manual_prompts = getattr(args, 'manual_sam_prompts', None)
     if manual_prompts is not None:
@@ -225,9 +227,14 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
     from sam.queries import query_groups, CHANNELS
     extra_prompts = getattr(args, 'extra_traversability_prompts', None) or []
     support_prompts = [args.support_prompt] if getattr(args, 'support_prompt', None) else []
-    needs_analysis = any(getattr(args, key, False) for key in ('steepness', 'cost_map', 'plan'))
+    framewise = args.planning_backend == 'framewise_grid'
+    final_fast = args.planning_backend == 'final_grid'
+    local_enabled = framewise and any(getattr(args,key,False) for key in ('steepness','cost_map','plan'))
+    needs_analysis = args.planning_backend=='exact_points' and any(getattr(args, key, False) for key in ('steepness', 'cost_map', 'plan'))
     save_evidence = args.save_frames or needs_analysis
     writer = None
+    local_planner = None
+    final_planner = None
     events = (args.output_dir / 'events.jsonl').open('w')
     state = {'status': 'loading', 'geometry_mode': 'causal streaming with existing model and KV cache',
              'geometry_frames': 0, 'mapped_frames': 0, 'vlm_calls': 0, 'invalid_proposals': 0,
@@ -253,6 +260,9 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
         events.flush()
 
     def status():
+        if local_planner is not None:
+            state['framewise_planning']=local_planner.snapshot()
+            state['planning_status']=state['framewise_planning']['status']
         state['controller_host_memory'] = host_memory()
         snapshots = list(state['gpu_memory'].values())
         if snapshots:
@@ -336,7 +346,16 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
         if not first:
             raise ValueError('Video contains no decodable frames')
         state.update(status='running', loading_model=None)
-        writer = StreamingPly(args.output_dir / 'obstacle_map.ply')
+        if not args.no_dense_recording:
+            writer = StreamingPly(args.output_dir / 'obstacle_map.ply')
+        if local_enabled:
+            from orchestrator.live_planning import LivePlanning
+            local_planner=LivePlanning(args,args.output_dir)
+            state['planning_backend']='framewise_grid'
+        elif final_fast and any(getattr(args,key,False) for key in ('steepness','cost_map','plan')):
+            from orchestrator.fast_final import FastFinal
+            final_planner=FastFinal(args,args.output_dir)
+            state['planning_backend']='final_grid'
         running_started = time.perf_counter()
         sequence = 0
 
@@ -423,10 +442,25 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
                             mask = masks['vlm_non_traversability_mask'] | masks['manual_non_traversability_mask']
                     prediction = {key: value[i] for key, value in predictions.items()}
                     mapped_at = time.perf_counter()
-                    points, colors, marked = project_frame(prediction, masks)
-                    writer.append(points, colors)
+                    if local_planner is not None or final_planner is not None:
+                        from orchestrator.projection import frame_arrays
+                        from orchestrator.semantics import colors as semantic_colors
+                        from orchestrator.io_utils import load_extrinsic
+                        rows,camera,shape=frame_arrays(prediction,masks)
+                        points=rows['points']; colors=semantic_colors(rows['source_rgb'],rows['support_mask'],rows['obstacle_mask'])
+                        marked=int(rows['obstacle_mask'].sum())
+                        extrinsic=load_extrinsic(prediction['extrinsic'])
+                        packet=dict(**rows,positive=rows['support_mask'],negative=rows['obstacle_mask'],
+                            pixels=rows['pixel_ids'],camera=camera,shape=shape,forward=extrinsic[:,:3].T[:,2],
+                            source_index=frame['source_index'],source_time=frame['source_time'],
+                            semantic_valid=not state['invalid_proposals'])
+                        if local_planner is not None: local_planner.submit(packet)
+                        else: final_planner.append(packet)
+                    else:
+                        points, colors, marked = project_frame(prediction, masks)
+                    if writer is not None: writer.append(points, colors)
                     display.append(points, colors)
-                    state.update(mapped_frames=state['mapped_frames'] + 1, points=writer.count,
+                    state.update(mapped_frames=state['mapped_frames'] + 1, points=state['points']+len(points),
                         marked_points=state['marked_points'] + marked, source_index=frame['source_index'],
                         source_time=frame['source_time'], prompts=active)
                     if state['mapped_frames'] == 1:
@@ -440,6 +474,9 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
                         'projection_seconds': time.perf_counter() - mapped_at,
                         'capture_to_map_seconds': time.perf_counter() - frame['captured']}
                     event(entry)
+                    if framewise or final_fast:
+                        np.savez(work/'preview.tmp.npz',rgb=rgb,mask=mask,source_index=frame['source_index'],source_time=frame['source_time'])
+                        (work/'preview.tmp.npz').replace(args.output_dir/'preview.npz')
                     if save_evidence:
                         name = f'frame_{frame["source_index"]:06d}.npz'
                         for directory in ('predictions', 'masks'):
@@ -480,6 +517,12 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
                 frames=semantic_frames, enabled_channels=enabled_channels, target=args.vlm_target,
                 query_groups={key: groups.get(key, []) for key in enabled_channels},
                 prompt_schedule='events.jsonl', alignment='fresh masks on mapped RGB'))
+        if final_planner is not None:
+            def final_progress(stage,done,total):
+                if stop_event is not None and stop_event.is_set(): raise RunCancelled()
+                state.update(status='analysing',analysis_progress=dict(stage=stage,completed=done,total=total));status()
+            state['framewise_planning']=final_planner.finish(final_progress)
+            state['planning_status']=state['framewise_planning']['status']
         if needs_analysis:
             if state['invalid_proposals']:
                 raise ValueError('VLM proposal failures leave incomplete required evidence; map retained, planning withheld')
@@ -521,6 +564,9 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
                     state['planning_status'] = planned['metadata']['status']
                     state['outputs']['route'] = str(route_dir)
             analysis_progress('finished', 1, 1)
+        if local_planner is not None:
+            local_planner.close()
+            state['framewise_planning']=local_planner.snapshot()
         state['status'] = 'complete'
     except RunCancelled:
         state['status'] = 'stopped'
@@ -534,6 +580,7 @@ def run(args, model_session=None, stop_event=None, output_stream=None):
             event({'type': 'worker_error', 'role': exc.role, **exc.message})
         raise
     finally:
+        if local_planner is not None: local_planner.close()
         status()
         if frames is not None:
             frames.close()
@@ -575,6 +622,17 @@ def parse_args(argv=None):
     parser.add_argument('--steepness', action='store_true', help='Analyze finalized snapshot; independent of route search')
     parser.add_argument('--cost-map', action='store_true', help='Build costs after completion without requiring route search')
     parser.add_argument('--plan', action='store_true', help='Build costs and certify a route after completion')
+    parser.add_argument('--planning-backend',choices=['exact_points','framewise_grid','final_grid'],default='exact_points')
+    parser.add_argument('--validation-backend',choices=['auto','cpu','gpu'],default='auto')
+    parser.add_argument('--start-policy',choices=['strict','visible_ground'],default='strict',
+                        help='visible_ground is a demo route on observed ground, not a verified robot-position connection')
+    parser.add_argument('--lookahead',type=float,default=12.,help='Forward local goal range in multiples of the support radius')
+    parser.add_argument('--fixed-lookahead',dest='auto_lookahead',action='store_false',help='Disable visible-ground range adaptation')
+    parser.add_argument('--keep-lower-layers',dest='filter_lower_layers',action='store_false',help='Disable observed ground-layer filtering in fast modes')
+    parser.add_argument('--keep-layer-path-anchor',dest='replan_layer_changes',action='store_false',help='Require a connection to the previous path after a confirmed layer correction')
+    parser.add_argument('--keep-disconnected-path-anchor',dest='replan_disconnected',action='store_false',help='Stop the visible-ground demo when the previous inferred path cannot connect; strict mode always stops')
+    parser.add_argument('--planning-budget-ms',type=float,default=40.)
+    parser.add_argument('--no-dense-recording',action='store_true',help='Keep bounded display data without writing the accumulated dense PLY')
     parser.add_argument('--analysis-workers', type=int, default=0, help='CPU analysis threads; 0 selects up to 12 automatically')
     parser.add_argument('--reference', type=float, nargs=3)
     parser.add_argument('--radius', type=float)
@@ -618,6 +676,18 @@ def parse_args(argv=None):
     parser.add_argument('--display-points', type=int, default=200_000)
     parser.add_argument('--display-interval', type=float, default=.5)
     args = parser.parse_args(argv)
+    if args.planning_backend in ('framewise_grid','final_grid') and args.plan: args.cost_map=True
+    if args.planning_backend=='exact_points' and args.no_dense_recording:
+        parser.error('no-dense-recording is available for the framewise backend')
+    if not np.isfinite(args.lookahead) or not .75<args.lookahead<=48:
+        parser.error('lookahead must be greater than 0.75 and at most 48 support radii')
+    if not np.isfinite(args.planning_budget_ms) or not 0<args.planning_budget_ms<=1000:
+        parser.error('planning-budget-ms must be positive and at most 1000')
+    for name in ('radius','clearance_height'):
+        value=getattr(args,name)
+        if value is not None and (not np.isfinite(value) or value<=0): parser.error(name+' must be finite and positive')
+    if args.reference is not None and (not np.isfinite(args.reference).all() or not np.linalg.norm(args.reference)):
+        parser.error('reference must be a finite nonzero vector')
     from path_planner.parallel import worker_count
     try:
         worker_count(args.analysis_workers)

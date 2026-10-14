@@ -22,6 +22,9 @@ from vlm.prompt_presets import DEFAULT_NAME, DEFAULT_INSTRUCTION, PromptPresets,
 from orchestrator.streaming import parse_args as stream_args, run
 from visualizer.scene_pose import PoseOverlay, CameraFollower, FOLLOW_DISTANCE, FOLLOW_HEIGHT, FOLLOW_FOV
 from visualizer.viewer_overview import overview_html, previews_html
+from visualizer.local_planning import LocalOverlay,route_message
+from path_planner.surface_layers import surface_from_overlay
+from visualizer.display import planning_view
 
 
 def command(args, video, output, frame_count=0, map_step=2):
@@ -40,6 +43,7 @@ def main():
     parser.add_argument('--output-root', type=Path, default=ROOT/'data/vlm_maps/live_demo')
     parser.add_argument('--port', type=int, default=8083)
     parser.add_argument('--initial-run', type=Path, help='Show an explicitly labeled saved map until a new run starts')
+    parser.add_argument('--initial-settings',type=Path,help='Restore previous controls independently of the saved preview')
     parser.add_argument('--lingbot-python', default=('/opt/conda/envs/lingbot-map/bin/python'
         if Path('/opt/conda/envs/lingbot-map/bin/python').exists() else sys.executable))
     parser.add_argument('--vlm-python', default='/opt/conda/bin/python')
@@ -55,6 +59,7 @@ def main():
     initial_config = {}
     if args.initial_run and (args.initial_run/'config.json').is_file():
         initial_config = json.loads((args.initial_run/'config.json').read_text())
+    if args.initial_settings: initial_config=json.loads(args.initial_settings.read_text())
     args.output_root = args.output_root.resolve()
     args.output_root.mkdir(parents=True, exist_ok=True)
     server = viser.ViserServer(host='0.0.0.0', port=args.port, label='Live VLM → SAM → LingBot map')
@@ -73,22 +78,29 @@ def main():
     with tabs.add_tab('Overview'):
         selection = server.gui.add_dropdown('Video', options=list(videos), initial_value=default)
         mode = server.gui.add_dropdown('Prompt source', options=['VLM proposals', 'Manual SAM prompts', 'Skip VLM'],
-            initial_value='VLM proposals', hint='Edit the instruction or object names in the Prompts tab.')
+            initial_value='Manual SAM prompts' if initial_config.get('manual_sam_prompts') is not None else ('Skip VLM' if initial_config.get('no_vlm') else 'VLM proposals'),
+            hint='Edit the instruction or object names in the Prompts tab.')
         start = server.gui.add_button('Start processing', color='green')
         stop = server.gui.add_button('Stop processing', disabled=True)
         colour_mode = server.gui.add_dropdown('Colour', options=['Traversability'], initial_value='Traversability')
         route_visible = server.gui.add_checkbox('Show route', initial_value=True)
-        legend = server.gui.add_markdown('Steepness/cost modes become available after finalized analysis.')
+        route_focus=server.gui.add_button('Focus planned path')
+        route_notice=server.gui.add_markdown('No path has been planned yet.')
+        show_local_grid = server.gui.add_checkbox('Show local terrain',initial_value=True)
+        raw_layers=server.gui.add_checkbox('Show full LingBot map',initial_value=True,
+            hint='Keep the complete accumulated reconstruction visible. Disable only to hide confirmed lower ground copies. Planner layer filtering is independent.')
+        legend = server.gui.add_markdown('Framewise mode shows live terrain, a yellow goal and a magenta connected route. Grey marks proposed history.')
+        terrain_detail=server.gui.add_markdown('Ctrl/Cmd-click terrain to inspect its decision.')
         follow_camera = server.gui.add_checkbox('Follow camera', True,
             hint='Third-person view behind and above the reconstructed camera. Adjust distance and field of view in Settings, or disable to inspect freely.')
         status = server.gui.add_html(overview_html({}, message='Choose a video. Edit the Prompts tab if needed, then Start processing.'))
         preview = server.gui.add_html('', visible=False)
     with tabs.add_tab('Prompts'):
-        target = server.gui.add_dropdown('VLM detection target', options=['non_traversable', 'traversable'], initial_value='non_traversable')
-        extra_enabled = server.gui.add_checkbox('Extra SAM traversability', initial_value=False)
-        extra_editor = server.gui.add_text('Independent traversability queries', 'path', multiline=True)
+        target = server.gui.add_dropdown('VLM detection target', options=['non_traversable', 'traversable'], initial_value=initial_config.get('vlm_target','non_traversable'))
+        extra_enabled = server.gui.add_checkbox('Extra SAM traversability', initial_value=bool(initial_config.get('extra_traversability_prompts')))
+        extra_editor = server.gui.add_text('Independent traversability queries', '\n'.join(initial_config.get('extra_traversability_prompts') or ['path']), multiline=True)
         server.gui.add_markdown('Extra queries run alongside VLM or with it disabled. Non-traversable labels veto overlaps in the cost map.')
-        sam_editor = server.gui.add_text('SAM object names', 'log', multiline=True, visible=False)
+        sam_editor = server.gui.add_text('SAM object names', '\n'.join(initial_config.get('manual_sam_prompts') or ['log']), multiline=True, visible=False)
         sam_notice = server.gui.add_markdown('One concrete object name per line, or separate names with commas. '
             'Up to 8 names are queried on every map update. Qwen is skipped.', visible=False)
         with server.gui.add_folder('VLM prompt', expand_by_default=True) as vlm_folder:
@@ -100,21 +112,40 @@ def main():
             prompt_notice = server.gui.add_markdown('Edit, then Start from Overview to test. Save a named preset to reuse it. '
                 'Keep JSON with a `prompts` list of concrete object names for SAM.')
     with tabs.add_tab('Settings'):
+        planning_mode=server.gui.add_dropdown('Planning mode',options=['Framewise local planning','Final-map fast planning','Final-map exact analysis (slow)'],
+            initial_value='Framewise local planning')
+        validation_backend=server.gui.add_dropdown('Geometry validation',options=['Auto GPU with CPU fallback','CPU','GPU with CPU fallback'],
+            initial_value='Auto GPU with CPU fallback')
+        start_policy=server.gui.add_dropdown('Local route start',options=['Visible ground (demo)','Strict camera ground'],
+            initial_value='Visible ground (demo)',hint='The visible-ground demo does not claim a verified connection from a robot position.')
+        lookahead=server.gui.add_slider('Forward lookahead (support radii)',min=1.,max=48.,step=.5,initial_value=float(initial_config.get('lookahead',12.)))
+        auto_lookahead=server.gui.add_checkbox('Auto visible-ground lookahead',initial_value=initial_config.get('auto_lookahead',True),
+            hint='Targets the furthest reachable observed ground, up to 48 support radii. Disable for a fixed bound.')
+        filter_layers=server.gui.add_checkbox('Remove lower ground copies',initial_value=initial_config.get('filter_lower_layers',True),
+            hint='Fast modes select supported ground layers and discard confirmed copies below the current surface.')
+        replan_layers=server.gui.add_checkbox('Replan after ground-layer correction (demo)',initial_value=initial_config.get('replan_layer_changes',True),
+            hint='Retire an invalid inferred path into an archive and start a new epoch. Disable to require the previous anchor. Strict starts never restart automatically.')
+        replan_disconnected=server.gui.add_checkbox('Continue on new visible ground (demo)',initial_value=initial_config.get('replan_disconnected',True),
+            hint='After two disconnected source frames, validate a fresh local segment and archive the old path. No connecting bridge is claimed. Strict mode always keeps its anchor.')
+        relative_radius=server.gui.add_number('Support radius (model units; 0 = auto)',initial_value=initial_config.get('radius') or 0.,min=0.,step=.001)
+        relative_height=server.gui.add_number('Clearance height (model units; 0 = camera estimate)',initial_value=initial_config.get('clearance_height') or 0.,min=0.,step=.001)
+        record_dense=server.gui.add_checkbox('Record dense map and frame evidence',initial_value=False)
         sam_enabled = server.gui.add_checkbox('SAM segmentation', initial_value=not initial_config.get('no_sam', False))
         support_enabled = server.gui.add_checkbox('Floor/ground support segmentation', initial_value=bool(initial_config.get('support_prompt')))
-        slopes_enabled = server.gui.add_checkbox('Slope / steepness analysis', initial_value=initial_config.get('steepness', False))
+        slopes_enabled = server.gui.add_checkbox('Slope exclusion', initial_value=initial_config.get('steepness', False),
+            hint='Fast modes screen small source-frame ground patches and exclude steep or unknown terrain.')
         costs_enabled = server.gui.add_checkbox('Cost map', initial_value=initial_config.get('cost_map', False))
         planner_enabled = server.gui.add_checkbox('Path planning (requires costs)', initial_value=initial_config.get('plan', False))
         analysis_workers = server.gui.add_number('Analysis CPU workers (0 = automatic)', initial_value=initial_config.get('analysis_workers', 0), min=0, max=32, step=1)
         reference_source = server.gui.add_dropdown('Reference/calibration evidence', options=['base_support', 'traversability'], initial_value='base_support')
-        server.gui.add_markdown('Analysis runs on the finalized map. Slope off + planning on uses an explicit slope-disabled policy. Visibility and computation are separate.')
+        server.gui.add_markdown('Framewise updates during processing. Final-map fast builds a bounded approximate grid after EOF. Exact analysis is the slow comparison option. Slope, costs and planning remain independent.')
         sampling = server.gui.add_dropdown('Processing mode',
-            options=['Standard sampling (4 FPS)', 'Offline frame count'], initial_value='Standard sampling (4 FPS)',
-            hint='Both modes build incrementally without dropping selected frames. Offline chooses a count over the full video.')
+            options=['Paced live sampling (2 FPS)', 'Standard sampling (4 FPS)', 'Offline frame count'], initial_value='Paced live sampling (2 FPS)',
+            hint='Paced live mode skips late frames. Offline frame count keeps selected frames.')
         frame_count = server.gui.add_number('Frames to process', initial_value=200, min=2, max=1024, step=1,
             disabled=True, hint='Unique source frames, evenly spaced from start to end. Capped at the number available in the video.')
         map_every = server.gui.add_dropdown('Map every', options=['2 selected frames (original)', 'Selected frame'],
-            initial_value='2 selected frames (original)', hint='Every frame runs geometry. This sets how often SAM and projection update the map.')
+            initial_value='Selected frame', hint='Every frame runs geometry. This sets how often SAM and projection update the map.')
         server.gui.add_markdown('Offline keeps the same incremental reconstruction and model settings. '
             'Choose a larger frame count for denser sampling; processing can take longer. '
             'Counts, elapsed time and map updates are shown in Overview. More frames do not guarantee better geometry.')
@@ -145,11 +176,18 @@ def main():
     session = ModelSession()
     pose_overlay = PoseOverlay(server)
     follower = CameraFollower(server)
+    local_overlay=LocalOverlay(server,terrain_detail)
+
+    @route_focus.on_click
+    def focus_route(event):
+        if event.client is not None and local_overlay.focus(event.client):
+            follow_camera.value=False;route_visible.value=True
 
     def update_prompt_controls(running=False):
         manual = mode.value == 'Manual SAM prompts'
         mode.disabled = target.disabled = running
-        for control in (extra_enabled, extra_editor, sam_enabled, support_enabled, slopes_enabled, costs_enabled, planner_enabled, reference_source, analysis_workers):
+        for control in (extra_enabled, extra_editor, sam_enabled, support_enabled, slopes_enabled, costs_enabled, planner_enabled, reference_source, analysis_workers,
+                        planning_mode,validation_backend,start_policy,lookahead,auto_lookahead,filter_layers,replan_layers,replan_disconnected,relative_radius,relative_height,record_dense):
             control.disabled = running
         sam_editor.visible = sam_notice.visible = manual
         vlm_folder.visible = mode.value == 'VLM proposals'
@@ -168,6 +206,11 @@ def main():
     def change_mode(_):
         with lock:
             update_prompt_controls(state['thread'] is not None and state['thread'].is_alive())
+
+    @planning_mode.on_update
+    def change_planning_mode(_):
+        if planning_mode.value!='Framewise local planning' and sampling.value=='Paced live sampling (2 FPS)':
+            sampling.value='Standard sampling (4 FPS)'
 
     @preset_selection.on_update
     def load_prompt(_):
@@ -252,7 +295,7 @@ def main():
                     print(probe.stderr, file=sys.stderr, flush=True)
                     return
                 free = json.loads(probe.stdout)['free_gib']
-                needed = 10. if missing_vlm else (11. if manual else 18.5)
+                needed = 10. if missing_vlm else (11. if mode.value != 'VLM proposals' else 18.5)
                 if free < needed:
                     state['launch_error'] = (f'GPU has {free:.2f} GiB free. This mode needs at least {needed:.1f} GiB free to start. '
                         'Free the GPU, then press Start processing again.')
@@ -272,6 +315,22 @@ def main():
             parameters.steepness, parameters.cost_map, parameters.plan = slopes_enabled.value, costs_enabled.value, planner_enabled.value
             parameters.analysis_workers = int(analysis_workers.value)
             parameters.reference_source = parameters.calibration_source = reference_source.value
+            framewise=planning_mode.value=='Framewise local planning'
+            fast=planning_mode.value!='Final-map exact analysis (slow)'
+            parameters.planning_backend='framewise_grid' if framewise else ('final_grid' if fast else 'exact_points')
+            parameters.validation_backend={'Auto GPU with CPU fallback':'auto','CPU':'cpu','GPU with CPU fallback':'gpu'}[validation_backend.value]
+            parameters.start_policy='visible_ground' if start_policy.value=='Visible ground (demo)' else 'strict'
+            parameters.lookahead=float(lookahead.value)
+            parameters.auto_lookahead=bool(auto_lookahead.value)
+            parameters.filter_lower_layers=bool(filter_layers.value)
+            parameters.replan_layer_changes=bool(replan_layers.value)
+            parameters.replan_disconnected=bool(replan_disconnected.value)
+            parameters.radius=float(relative_radius.value) or None
+            parameters.clearance_height=float(relative_height.value) or None
+            parameters.realtime=sampling.value=='Paced live sampling (2 FPS)'
+            parameters.input_fps=2. if parameters.realtime else 4.
+            parameters.save_frames=record_dense.value if fast else True
+            parameters.no_dense_recording=fast and not record_dense.value
             cancel.clear()
             def process_video():
                 with directory.with_suffix('.log').open('w') as log:
@@ -316,7 +375,7 @@ def main():
 
     @colour_mode.on_update
     def change_colour(_):
-        if finalized['view'] is not None and cloud is not None:
+        if finalized['view'] is not None and cloud is not None and colour_mode.value in finalized['view']['modes']:
             cloud.colors = finalized['view']['modes'][colour_mode.value]
 
     @route_visible.on_update
@@ -325,6 +384,7 @@ def main():
             finalized['route'].visible = route_visible.value
 
     current_directory, cloud, display_mtime, preview_source = None, None, None, None
+    raw_display=None;filtered_key=None
     extent = 1.
     try:
         while True:
@@ -340,21 +400,30 @@ def main():
                 if cloud is not None:
                     cloud.remove()
                 pose_overlay.clear()
+                local_overlay.clear()
                 follower.reset()
                 current_directory = directory
                 cloud, display_mtime, preview_source = None, None, None
+                raw_display=None;filtered_key=None
                 preview.visible = False
                 if finalized['route'] is not None: finalized['route'].remove()
                 finalized.update(directory=None, view=None, route=None)
                 colour_mode.options = ['Traversability']
                 colour_mode.value = 'Traversability'
+                route_notice.content='No path yet: waiting for ground observations.'
+                route_focus.disabled=True
             data = {}
             path = directory/'status.json'
             if path.exists():
                 data = json.loads(path.read_text())
+            local_status=directory/'local_planning/status.json'
+            if local_status.exists():
+                data['framewise_planning']=json.loads(local_status.read_text())
+                data['planning_status']=data['framewise_planning']['status']
             message = ''
             if thread is None:
-                message = 'Saved preview. Press Start processing for a new run.'
+                message = ('Saved-frame diagnostic (local reference supplied). Press Start processing for a new run.'
+                    if data.get('diagnostic_preview') else 'Saved preview. Press Start processing for a new run.')
             elif not thread.is_alive():
                 start.disabled = selection.disabled = False
                 update_prompt_controls()
@@ -369,17 +438,42 @@ def main():
             status.content = overview_html(data,
                 directory.relative_to(ROOT) if directory.is_relative_to(ROOT) else directory,
                 session.loaded_roles, message, launch_error)
+            local=data.get('framewise_planning')
+            if local is not None:
+                modes=local_overlay.update(directory,local,colour_mode.value,extent,show_local_grid.value,route_visible.value)
+                overlay_data=local_overlay.data or {}
+                route_notice.content=route_message(local,len(overlay_data.get('route',[])),
+                    len(overlay_data.get('last_route',[]))>1 or len(overlay_data.get('history',[]))>1)
+                route_focus.disabled=not any(len(overlay_data.get(key,[]))>1 for key in ('route','last_route','history'))
+                if modes and list(colour_mode.options)!=modes:
+                    value=colour_mode.value
+                    colour_mode.options=modes; colour_mode.value=value if value in modes else modes[-1]
+                label=('Saved-frame planning check' if local.get('diagnostic_scope') else
+                    ('Fast final planning' if local.get('phase')=='final_fast' else 'Live planning'))
+                legend.content=(label+': **'+str(local.get('status','waiting'))+'**. '
+                    'Yellow: observed forward goal. Magenta: current connected suffix. Grey: proposed history.\n\n'
+                    'Terrain: green eligible · grey uncertain · orange steep · red obstacle · muted red clearance.\n\n'
+                    +f"Validation: {local.get('validation_backend','pending')} · {local.get('processing_ms',0):.0f} ms · "
+                    +f"revision {local.get('revision',0)} · {local.get('start_policy','')} · model units.\n\n"
+                    +f"Ground reference: {local.get('reference_method','pending')} · lookahead {local.get('effective_lookahead',lookahead.value):.1f} radii.\n\n"
+                    +str(local.get('calibration',''))
+                    + ('\n\nGPU fallback: '+str(local['backend_note']) if local.get('backend_note') else ''))
             display = directory/'display.npz'
             if display.exists() and display.stat().st_mtime_ns != display_mtime:
                 mtime = display.stat().st_mtime_ns
                 with np.load(display,allow_pickle=False) as prediction:
                     points, colors = prediction['points'].copy(), prediction['colors'].copy()
+                    raw_display={key:prediction[key].copy() for key in prediction.files}
                 if len(points):
                     lo,hi = np.percentile(points,[2,98],axis=0)
                     extent = max(float(np.max(hi-lo)),1e-3)
                     cloud = server.scene.add_point_cloud('/live_map',points=points,colors=colors,
                         point_size=extent*.001,precision='float32',point_shape='circle')
                 display_mtime=mtime
+            key=(display_mtime,local_overlay.mtime,raw_layers.value)
+            if cloud is not None and raw_display is not None and key!=filtered_key and local is not None:
+                points,colors=planning_view(raw_display,surface_from_overlay(local_overlay.data),raw_layers.value)
+                cloud.points=points;cloud.colors=colors;filtered_key=key
             view_key = (directory, tuple(sorted(data.get('outputs', {}).items())))
             if data.get('status') in ('analysing', 'complete') and data.get('outputs', {}).get('map') and finalized['directory'] != view_key:
                 from visualizer.integrated import load_view
@@ -408,6 +502,13 @@ def main():
                     distance=follow_distance.value, height=follow_height.value, fov_degrees=follow_fov.value)
             source=data.get('source_index')
             if source is not None and source != preview_source:
+                live_preview=directory/'preview.npz'
+                if live_preview.exists():
+                    with np.load(live_preview,allow_pickle=False) as saved:
+                        preview.content=previews_html(saved['rgb'],saved['mask'],float(saved['source_time']))
+                    preview.visible=True; preview_source=source
+                    time.sleep(.2)
+                    continue
                 name=f'frame_{source:06d}.npz'
                 prediction,mask_path=directory/'predictions'/name,directory/'masks'/name
                 if prediction.exists() and mask_path.exists():

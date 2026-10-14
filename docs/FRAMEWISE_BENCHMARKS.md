@@ -4,6 +4,16 @@ The implementation plan is saved in Git. These are experimental CPU-only
 benchmarks outside the application, not an integrated real-time feature.
 Production Python/C++ code, model weights and the running server were unchanged.
 
+The subsequent [persistent connected-path test](PERSISTENT_PATH_BENCHMARKS.md)
+adds stable source-aware terrain, controlled obstacle/turn replay and recorded
+video continuity measurements. Controlled splices pass; reliable real-video
+navigation and the temporal 100 ms CPU target remain unproven.
+
+The [GPU geometry benchmark](GPU_PLANNING_BENCHMARKS.md) subsequently matched the
+CPU predicates on 22 real-data cases and measured resident validation at
+27.9 ms median / 40.6 ms P95 alongside paced real-model inference. These are
+validation timings, not integrated connected-path or fresh-map rates.
+
 ## Inputs and reproduction
 
 Experiments used the real-model saved IMG_5701 stream (56 mapped frames,
