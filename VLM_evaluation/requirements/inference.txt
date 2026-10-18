@@ -1,9 +1,0 @@
-# Documented-compatible stack; actual CUDA/quantized integration still needs validation.
-# Install the torch/torchvision CUDA wheels first, using the official PyTorch index.
-torch==2.13.0
-torchvision==0.28.0
-transformers==5.18.0
-accelerate==1.15.0
-bitsandbytes==0.50.2
-numpy>=2.0,<3
-Pillow>=11,<13

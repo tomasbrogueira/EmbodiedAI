@@ -1,4 +1,0 @@
-# CPU-only image/reference preparation. No model or GPU dependencies.
-numpy>=1.26,<2
-Pillow>=10,<13
-pycocotools==2.0.11

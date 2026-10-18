@@ -1,0 +1,106 @@
+{
+  "edge_grades": {
+    "same_source_frame": {
+      "edges": 14757,
+      "over_30_percent": 0.4540218201531477,
+      "apparent_grade_degree_quantiles": [
+        0.6451588908266473,
+        2.884340238190288,
+        9.308162551525388
+      ]
+    },
+    "different_source_frame": {
+      "edges": 12560,
+      "over_30_percent": 67.35668789808918,
+      "apparent_grade_degree_quantiles": [
+        8.562702500611199,
+        45.47311937893319,
+        72.20423807886
+      ]
+    }
+  },
+  "nearest_start_candidates_without_slopes": [
+    {
+      "start_id": 86733,
+      "horizontal_offset": 0.264195837355976,
+      "component_cells": 44,
+      "reachable_cells": 44,
+      "maximum_progress": 0.06411144602081809,
+      "minimum_partial_progress": 0.010689980182372343
+    },
+    {
+      "start_id": 85565,
+      "horizontal_offset": 0.2728085483643861,
+      "component_cells": 6724,
+      "reachable_cells": 6724,
+      "maximum_progress": 0.4200729504181967,
+      "minimum_partial_progress": 0.010689980182372343
+    },
+    {
+      "start_id": 88249,
+      "horizontal_offset": 0.27487809877964714,
+      "component_cells": 61,
+      "reachable_cells": 61,
+      "maximum_progress": 0.02926398822698109,
+      "minimum_partial_progress": 0.010689980182372343
+    },
+    {
+      "start_id": 88261,
+      "horizontal_offset": 0.2773578772352927,
+      "component_cells": 34,
+      "reachable_cells": 34,
+      "maximum_progress": 0.020985063639108077,
+      "minimum_partial_progress": 0.010689980182372343
+    }
+  ],
+  "source_slope_defined": 14985,
+  "source_slope_under_30": 14868,
+  "source_normal_and_index_ms": 4205.807332880795,
+  "variants": {
+    "source_normals": {
+      "eligible": 14868,
+      "four_connected_components": 230,
+      "largest_component": 6724,
+      "components_at_least_six": 41,
+      "candidate_status": "no_connected_final_route",
+      "candidate_vertices": 0,
+      "candidate_goal_reached": false,
+      "candidate_expanded": 0,
+      "validation_reason": "no_candidate",
+      "validated": false,
+      "attempts": [],
+      "final_vertices": 0,
+      "final_goal_reached": false
+    },
+    "source_normals_without_grid_edge_grade": {
+      "eligible": 14868,
+      "four_connected_components": 230,
+      "largest_component": 6724,
+      "components_at_least_six": 41,
+      "candidate_status": "no_connected_final_route",
+      "candidate_vertices": 0,
+      "candidate_goal_reached": false,
+      "candidate_expanded": 0,
+      "validation_reason": "no_candidate",
+      "validated": false,
+      "attempts": [],
+      "final_vertices": 0,
+      "final_goal_reached": false
+    },
+    "slopes_disabled": {
+      "eligible": 14985,
+      "four_connected_components": 220,
+      "largest_component": 6724,
+      "components_at_least_six": 38,
+      "candidate_status": "no_connected_final_route",
+      "candidate_vertices": 0,
+      "candidate_goal_reached": false,
+      "candidate_expanded": 0,
+      "validation_reason": "no_candidate",
+      "validated": false,
+      "attempts": [],
+      "final_vertices": 0,
+      "final_goal_reached": false
+    }
+  }
+}

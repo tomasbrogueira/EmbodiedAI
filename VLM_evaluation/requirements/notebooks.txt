@@ -1,5 +1,0 @@
-# Notebook support is an explicit setup option; it never downloads model weights.
-jupyterlab>=4,<5
-ipykernel>=6.29,<8
-nbformat>=5.10,<6
-nbclient>=0.10,<1

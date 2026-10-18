@@ -1,0 +1,143 @@
+# Support direct compatibility-script execution without environment mutation.
+if __package__ in (None, ''):
+    import sys as _sys
+    from pathlib import Path as _Path
+    _sys.path.insert(0, str(_Path(__file__).resolve().parents[1]))
+import argparse
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "sam3"))
+
+import numpy as np
+from sam.cpu_video import keep_video_on_cpu
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Generate SAM3 video segmentation masks."
+    )
+    parser.add_argument('--checkpoint', help='Local SAM3 video checkpoint')
+
+    parser.add_argument(
+        "--video_path",
+        type=Path,
+        required=True,
+        help="Path to the input video.",
+    )
+
+    parser.add_argument(
+        "--output_folder",
+        type=Path,
+        required=True,
+        help=(
+            "Base output directory. Masks will be saved in a "
+            "<VIDEO_NAME>_masks subdirectory."
+        ),
+    )
+
+    parser.add_argument(
+        "--prompt",
+        type=str,
+        required=True,
+        help='Text prompt, e.g. "path", "floor", or "ground".',
+    )
+
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+
+    video_path = args.video_path.expanduser().resolve()
+    output_root = args.output_folder.expanduser()
+    prompt = args.prompt
+
+    if not video_path.is_file():
+        raise FileNotFoundError(
+            f"Video file not found: {video_path}"
+        )
+
+    video_name = video_path.stem
+
+    # Preserve the original output directory naming convention.
+    out_dir = output_root / f"{video_name}_masks"
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    print("=" * 60)
+    print("SAM3 VIDEO SEGMENTATION")
+    print("=" * 60)
+    print(f"Video:  {video_path}")
+    print(f"Prompt: {prompt}")
+    print(f"Output: {out_dir.resolve()}")
+    print("=" * 60)
+
+    from sam3.model_builder import build_sam3_video_predictor
+    predictor = build_sam3_video_predictor(checkpoint_path=args.checkpoint) if args.checkpoint else build_sam3_video_predictor()
+    keep_video_on_cpu(predictor.model)
+    session_id = None
+
+    try:
+        # Start video session.
+        session = predictor.handle_request(
+            request={
+                "type": "start_session",
+                "resource_path": str(video_path),
+                "offload_video_to_cpu": True,
+                "offload_state_to_cpu": True,
+            }
+        )
+
+        session_id = session["session_id"]
+
+        # Add the prompt on the first frame.
+        predictor.handle_request(
+            request={
+                "type": "add_prompt",
+                "session_id": session_id,
+                "frame_index": 0,
+                "text": prompt,
+            }
+        )
+
+        # Propagate segmentation through the entire video.
+        frames_saved = 0
+
+        for response in predictor.handle_stream_request(
+            request={
+                "type": "propagate_in_video",
+                "session_id": session_id,
+            }
+        ):
+            frame_idx = response["frame_index"]
+            outputs = response["outputs"]
+
+            output_path = (
+                out_dir
+                / f"{video_name}_{prompt}_frame{frame_idx:06d}.npz"
+            )
+
+            np.savez_compressed(
+                output_path,
+                **outputs,
+            )
+
+            frames_saved += 1
+            print(f"Saved frame {frame_idx}: {output_path.name}")
+
+        print("\nSegmentation complete.")
+        print(f"Frames saved: {frames_saved}")
+        print(f"Output directory: {out_dir.resolve()}")
+
+    finally:
+        # Close the session even if propagation encounters an error.
+        if session_id is not None:
+            predictor.handle_request(
+                request={
+                    "type": "close_session",
+                    "session_id": session_id,
+                }
+            )
+
+
+if __name__ == "__main__":
+    main()

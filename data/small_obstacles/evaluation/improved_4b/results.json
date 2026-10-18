@@ -1,0 +1,1601 @@
+{
+  "model": "Qwen/Qwen3-VL-4B-Instruct",
+  "interval_seconds": 2.0,
+  "instruction": "Describe the visible ground, then identify visible hazards for\nRobot: a small wheeled ground robot. Return only JSON with \"ground\" (one factual sentence) and\n\"prompts\" (a list of short object names for SAM3).\n\nInclude an object only when it is visibly loose, detached or displaced on the\nground where the robot could travel. Also include visibly identifiable bodies\nof water and actual open holes or ditches. Do not assume an object is hazardous\nmerely because it is visible. A detached log across a path qualifies.\n\nExclude normal terrain and installed infrastructure: maintained gravel paths,\ngrass or vegetation alone, scattered leaves, intact pavement, paving stones,\ninstalled path slabs or steps, and closed flush drain or manhole covers.\nJoints, cracks or shadows alone do not make a slab broken or a hole open.\nExclude furniture, buildings, fixed posts and objects on tables. A loose rock\nor displaced fragment qualifies; the intact surface underneath it does not.\n\nUse distinct lowercase conventional object nouns of one to three words.\nName the object itself, without color, position, size or pose: use \"stone block\"\nrather than \"tilted stone block\". Do not use vague labels such as \"debris\",\n\"fragment\", \"gravel debris\", \"obstacle\" or \"overgrown grass\". If the specific\nobject type or its loose/displaced status is unclear, omit it. Never invent\nwater or holes from stains or shadows. Do not copy examples unless visible.\nIf no qualifying hazard is visible, \"prompts\" must be []. Do not speculate.\n",
+  "preprocessing": "LingBot-style 518-width resize and center crop; PIL bicubic",
+  "ground_truth_available": false,
+  "videos": [
+    {
+      "video": "data/videos/indoor/IMG_5506.mp4",
+      "metadata": {
+        "duration_seconds": 10.677333,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "indoor/IMG_5506",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"polished stone tiles with natural veining and minor surface imperfections\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 1.14063272299245
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"polished stone tiles with natural veining and minor surface stains\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5897050681523979
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"polished stone floor with visible reflections and minor discoloration\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5884050643071532
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"polished stone floor with visible reflections and minor surface imperfections.\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5897818068042397
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"polished stone floor with visible reflections and minor surface imperfections.\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5925080673769116
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"polished marble floor with scattered dark specks and minor surface imperfections.\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.6335582160390913
+        }
+      ]
+    },
+    {
+      "video": "data/videos/indoor/IMG_5507.mp4",
+      "metadata": {
+        "duration_seconds": 11.344667,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "indoor/IMG_5507",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth polished tile floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.441093510016799
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth polished concrete floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43787870835512877
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth polished concrete floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4360034642741084
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth polished concrete floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4354873229749501
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"polished concrete floor reflecting overhead lights\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.49304051976650953
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"polished concrete floor with reflections of overhead lights\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.531586557161063
+        },
+        {
+          "timestamp_seconds": 11.144667,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"polished concrete floor reflecting overhead lights\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.492805490270257
+        }
+      ]
+    },
+    {
+      "video": "data/videos/indoor/IMG_5508.mp4",
+      "metadata": {
+        "duration_seconds": 16.649967,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "indoor/IMG_5508",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"concrete stairs with metal railings on both sides\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5503256395459175
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"concrete stairs with visible stains and minor surface wear\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5525969169102609
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"no visible ground\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.418452852871269
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth beige stone floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43807917926460505
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"no visible ground\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.416645186021924
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"no visible ground\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.41862031631171703
+        },
+        {
+          "timestamp_seconds": 12.0,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"marble steps with visible mineral veins\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.49529847502708435
+        },
+        {
+          "timestamp_seconds": 14.0,
+          "image": "frame_007.jpg",
+          "context_image": "context_007.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth reflective floor with minor stains\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.47549500875175
+        },
+        {
+          "timestamp_seconds": 16.0,
+          "image": "frame_008.jpg",
+          "context_image": "context_008.jpg",
+          "raw_response": "{\n  \"ground\": \"light-colored tiled floor with minor scuff marks\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5327571802772582
+        }
+      ]
+    },
+    {
+      "video": "data/videos/indoor/IMG_5522.mp4",
+      "metadata": {
+        "duration_seconds": 22.540856,
+        "width": 478,
+        "height": 850,
+        "avg_frame_rate": "8640000/289811"
+      },
+      "artifact_directory": "indoor/IMG_5522",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth reflective floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4162655333057046
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth reflective floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.41618995601311326
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth reflective floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4171704240143299
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth concrete floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.418570414185524
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth polished concrete floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43631498282775283
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth reflective floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4163712006993592
+        },
+        {
+          "timestamp_seconds": 12.0,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"shiny reflective floor tiles\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4543625609949231
+        },
+        {
+          "timestamp_seconds": 14.0,
+          "image": "frame_007.jpg",
+          "context_image": "context_007.jpg",
+          "raw_response": "{\n  \"ground\": \"shiny reflective floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4373277733102441
+        },
+        {
+          "timestamp_seconds": 16.0,
+          "image": "frame_008.jpg",
+          "context_image": "context_008.jpg",
+          "raw_response": "{\n  \"ground\": \"shiny reflective floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43655754206702113
+        },
+        {
+          "timestamp_seconds": 18.0,
+          "image": "frame_009.jpg",
+          "context_image": "context_009.jpg",
+          "raw_response": "{\n  \"ground\": \"shiny reflective floor tiles\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.455648610368371
+        },
+        {
+          "timestamp_seconds": 20.0,
+          "image": "frame_010.jpg",
+          "context_image": "context_010.jpg",
+          "raw_response": "{\n  \"ground\": \"shiny reflective floor tiles\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4545862996019423
+        },
+        {
+          "timestamp_seconds": 22.0,
+          "image": "frame_011.jpg",
+          "context_image": "context_011.jpg",
+          "raw_response": "{\n  \"ground\": \"concrete floor with scattered dark fabric\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4962846259586513
+        }
+      ]
+    },
+    {
+      "video": "data/videos/indoor/IMG_5523.mp4",
+      "metadata": {
+        "duration_seconds": 22.002044,
+        "width": 478,
+        "height": 850,
+        "avg_frame_rate": "7368750/247523"
+      },
+      "artifact_directory": "indoor/IMG_5523",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth polished concrete floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43878295086324215
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth polished concrete floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43797429697588086
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth concrete floor with minor stains and reflections\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5151523537933826
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"no visible ground\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4170517879538238
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"concrete stairs with metal railings on both sides\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5535952183417976
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"no visible hazards\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4174159471876919
+        },
+        {
+          "timestamp_seconds": 12.0,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"no visible hazards\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4174186959862709
+        },
+        {
+          "timestamp_seconds": 14.0,
+          "image": "frame_007.jpg",
+          "context_image": "context_007.jpg",
+          "raw_response": "{\n  \"ground\": \"no visible ground\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.41852110298350453
+        },
+        {
+          "timestamp_seconds": 16.0,
+          "image": "frame_008.jpg",
+          "context_image": "context_008.jpg",
+          "raw_response": "{\n  \"ground\": \"marble steps with visible wear and minor discoloration\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5723853609524667
+        },
+        {
+          "timestamp_seconds": 18.0,
+          "image": "frame_009.jpg",
+          "context_image": "context_009.jpg",
+          "raw_response": "{\n  \"ground\": \"smooth reflective concrete floor\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4362019319087267
+        },
+        {
+          "timestamp_seconds": 20.0,
+          "image": "frame_010.jpg",
+          "context_image": "context_010.jpg",
+          "raw_response": "{\n  \"ground\": \"marble-like tiled floor with dark streaks\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5320199830457568
+        },
+        {
+          "timestamp_seconds": 21.802044000000002,
+          "image": "frame_011.jpg",
+          "context_image": "context_011.jpg",
+          "raw_response": "{\n  \"ground\": \"dark textured carpet with a light-colored threshold edge\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5308116339147091
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5509.mp4",
+      "metadata": {
+        "duration_seconds": 10.7107,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "outdoor/IMG_5509",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"paved area with scattered small leaves and a low-lying bush at the edge.\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.6667102701030672
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"gray paved surface with scattered small stones\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4981147679500282
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"gray stone pavement with scattered small green plant fragments\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5318053709343076
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"gray stone tiles with scattered green plant debris\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5154206822626293
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"gray stone pavement with scattered green plant debris\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5165485022589564
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"gray stone tiles with scattered green plant stems\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5146543048322201
+        },
+        {
+          "timestamp_seconds": 10.5107,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"gray stone tiles with scattered green moss patches\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.516907059121877
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5510.mp4",
+      "metadata": {
+        "duration_seconds": 11.3113,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "outdoor/IMG_5510",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"gray paved surface with scattered small stones and minor cracks\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5531268962658942
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"no hazardous objects visible\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4364070217125118
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"no hazards visible\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4179569440893829
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"gray pavement with scattered small stones and a tilted stone block.\",\n  \"prompts\": [\n    \"stone block\"\n  ]\n}",
+          "prompts": [
+            "stone block"
+          ],
+          "error": null,
+          "inference_seconds": 0.7051357580348849
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"gray stone block is tilted and displaced on pavement\",\n  \"prompts\": [\n    \"stone block\"\n  ]\n}",
+          "prompts": [
+            "stone block"
+          ],
+          "error": null,
+          "inference_seconds": 0.6687755128368735
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"gray pavement with a cracked stone block near the edge.\",\n  \"prompts\": [\n    \"stone block\"\n  ]\n}",
+          "prompts": [
+            "stone block"
+          ],
+          "error": null,
+          "inference_seconds": 0.6890924978069961
+        },
+        {
+          "timestamp_seconds": 11.1113,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"gray stone pavement with a displaced stone block near the edge.\",\n  \"prompts\": [\n    \"stone block\"\n  ]\n}",
+          "prompts": [
+            "stone block"
+          ],
+          "error": null,
+          "inference_seconds": 0.7047919267788529
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5511.mp4",
+      "metadata": {
+        "duration_seconds": 20.687333,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "outdoor/IMG_5511",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with overgrown grass on sides\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5340919131413102
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with overgrown grass on sides\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.534983177203685
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with overgrown grass on sides\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5393560011871159
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by overgrown grass\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5149573311209679
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with overgrown grass on sides\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5335250729694963
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by overgrown grass\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5139351403340697
+        },
+        {
+          "timestamp_seconds": 12.0,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with scattered leaves and grass on sides\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5533113977871835
+        },
+        {
+          "timestamp_seconds": 14.0,
+          "image": "frame_007.jpg",
+          "context_image": "context_007.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with scattered leaves and grass edges\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5371854649856687
+        },
+        {
+          "timestamp_seconds": 16.0,
+          "image": "frame_008.jpg",
+          "context_image": "context_008.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with scattered leaves and grass edges\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5322885466739535
+        },
+        {
+          "timestamp_seconds": 18.0,
+          "image": "frame_009.jpg",
+          "context_image": "context_009.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with scattered leaves and small stones\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5349972187541425
+        },
+        {
+          "timestamp_seconds": 20.0,
+          "image": "frame_010.jpg",
+          "context_image": "context_010.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with scattered leaves and small rocks\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5322486101649702
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5512.mp4",
+      "metadata": {
+        "duration_seconds": 16.3163,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "outdoor/IMG_5512",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"overgrown grass with scattered leaves and tall vegetation\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5327466232702136
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"overgrown grass with scattered leaves and tall weeds.\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5326368911191821
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"overgrown grass and weeds with a narrow path through it\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5730123165994883
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"overgrown grass with a narrow dirt path winding through it\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5698731141164899
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"a narrow dirt path through tall grass and weeds\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.535534456372261
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"a narrow dirt path through tall grass and weeds\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5335879637859762
+        },
+        {
+          "timestamp_seconds": 12.0,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"a narrow dirt path through overgrown grass and weeds\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5523529429920018
+        },
+        {
+          "timestamp_seconds": 14.0,
+          "image": "frame_007.jpg",
+          "context_image": "context_007.jpg",
+          "raw_response": "{\n  \"ground\": \"overgrown grass and weeds with scattered leaves and a small green bird on the ground\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.6678940639831126
+        },
+        {
+          "timestamp_seconds": 16.0,
+          "image": "frame_008.jpg",
+          "context_image": "context_008.jpg",
+          "raw_response": "{\n  \"ground\": \"overgrown grass and weeds with scattered dry plant stalks\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5765738980844617
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5513.mp4",
+      "metadata": {
+        "duration_seconds": 10.777433,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "outdoor/IMG_5513",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt pavement with a landscaped area containing tall grasses and shrubs\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.6463086558505893
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt pavement with no visible hazards\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5016537276096642
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"flat paved surface with no visible hazards\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4937157337553799
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt pavement with visible cracks and a person standing near the building entrance\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.6296405848115683
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt pavement with visible cracks and a small patch of dry grass near the curb\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.6674108877778053
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt pavement with no visible hazards\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.501879699062556
+        },
+        {
+          "timestamp_seconds": 10.577433000000001,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt pavement with visible painted lines\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.49897920712828636
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5514.mp4",
+      "metadata": {
+        "duration_seconds": 18.351667,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "outdoor/IMG_5514",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by grass\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.47766162687912583
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by grass\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.47430024296045303
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by grass\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.48281334806233644
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path winding through grassy terrain\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5133179519325495
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path winding through grassy terrain\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5171348266303539
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by green grass and trees\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5317169511690736
+        },
+        {
+          "timestamp_seconds": 12.0,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by overgrown grass and vegetation\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5517383478581905
+        },
+        {
+          "timestamp_seconds": 14.0,
+          "image": "frame_007.jpg",
+          "context_image": "context_007.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with overgrown grass on the left side\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5704701137728989
+        },
+        {
+          "timestamp_seconds": 16.0,
+          "image": "frame_008.jpg",
+          "context_image": "context_008.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with scattered grass and small stones\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5318148168735206
+        },
+        {
+          "timestamp_seconds": 18.0,
+          "image": "frame_009.jpg",
+          "context_image": "context_009.jpg",
+          "raw_response": "{\n  \"ground\": \"a grassy slope with scattered vegetation and uneven terrain\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5502301817759871
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5515.mp4",
+      "metadata": {
+        "duration_seconds": 6.573233,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "outdoor/IMG_5515",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by grass and trees\",\n  \"prompts\": [\n    \"log\"\n  ]\n}",
+          "prompts": [
+            "log"
+          ],
+          "error": null,
+          "inference_seconds": 0.6263914639130235
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with scattered grass and a fallen log across it\",\n  \"prompts\": [\n    \"fallen log\"\n  ]\n}",
+          "prompts": [
+            "fallen log"
+          ],
+          "error": null,
+          "inference_seconds": 0.7474269340746105
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with scattered grass and a fallen log\",\n  \"prompts\": [\n    \"log\"\n  ]\n}",
+          "prompts": [
+            "log"
+          ],
+          "error": null,
+          "inference_seconds": 0.6671890551224351
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel and grass with scattered small stones\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5132653876207769
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5516.mp4",
+      "metadata": {
+        "duration_seconds": 11.644967,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "outdoor/IMG_5516",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with a fallen log across it\",\n  \"prompts\": [\n    \"log\"\n  ]\n}",
+          "prompts": [
+            "log"
+          ],
+          "error": null,
+          "inference_seconds": 0.6448039007373154
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"a fallen log lies across a gravel path\",\n  \"prompts\": [\n    \"log\"\n  ]\n}",
+          "prompts": [
+            "log"
+          ],
+          "error": null,
+          "inference_seconds": 0.6296386118046939
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"a fallen log lies across a gravel path\",\n  \"prompts\": [\n    \"log\"\n  ]\n}",
+          "prompts": [
+            "log"
+          ],
+          "error": null,
+          "inference_seconds": 0.633691867813468
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by grass and a tree with orange leaves.\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5915474928915501
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by green grass\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4934864300303161
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by grass\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.47466861503198743
+        },
+        {
+          "timestamp_seconds": 11.444967,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by grass\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4744258760474622
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5517.mp4",
+      "metadata": {
+        "duration_seconds": 7.440767,
+        "width": 1080,
+        "height": 1920,
+        "avg_frame_rate": "30000/1001"
+      },
+      "artifact_directory": "outdoor/IMG_5517",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path bordered by grass and trees\",\n  \"prompts\": [\n    \"detached log\"\n  ]\n}",
+          "prompts": [
+            "detached log"
+          ],
+          "error": null,
+          "inference_seconds": 0.6662613209336996
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel path with scattered grass and a fallen log across it\",\n  \"prompts\": [\n    \"fallen log\"\n  ]\n}",
+          "prompts": [
+            "fallen log"
+          ],
+          "error": null,
+          "inference_seconds": 0.741583451628685
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel and grass mixed terrain with a fallen log across a path\",\n  \"prompts\": [\n    \"fallen log\"\n  ]\n}",
+          "prompts": [
+            "fallen log"
+          ],
+          "error": null,
+          "inference_seconds": 0.7615495147183537
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel and grass mixed terrain with scattered stone blocks\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5508407242596149
+        },
+        {
+          "timestamp_seconds": 7.240767,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel and grass mixture with scattered loose stones\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5317470277659595
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5518.mp4",
+      "metadata": {
+        "duration_seconds": 12.077356,
+        "width": 478,
+        "height": 850,
+        "avg_frame_rate": "16065000/543481"
+      },
+      "artifact_directory": "outdoor/IMG_5518",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel with scattered leaves\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.45465290267020464
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"gravel with scattered leaves\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4552512727677822
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"dark soil piled beside a concrete bench and trash can\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.550700506195426
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt pavement with scattered leaves and a single red object near center\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.6096623688936234
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"concrete pavement with scattered red objects\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.49232723470777273
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt surface with scattered small debris\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4925748179666698
+        },
+        {
+          "timestamp_seconds": 11.877356,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"paved sidewalk with a curb and asphalt road adjacent\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5502242669463158
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5519.mp4",
+      "metadata": {
+        "duration_seconds": 12.910267,
+        "width": 478,
+        "height": 850,
+        "avg_frame_rate": "2865000/96827"
+      },
+      "artifact_directory": "outdoor/IMG_5519",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"no hazardous objects visible\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43501637130975723
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"no hazardous objects visible\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43497138284146786
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"no hazardous objects visible\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43496492272242904
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"paved pathway with grass on sides\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4926336300559342
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt path bordered by grass and trees\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5122942188754678
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt path with grass edges and a tree trunk nearby\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5684752902016044
+        },
+        {
+          "timestamp_seconds": 12.0,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt path with grass edges and a tree trunk nearby\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5694227339699864
+        },
+        {
+          "timestamp_seconds": 12.710267,
+          "image": "frame_007.jpg",
+          "context_image": "context_007.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt pathway bordered by grass and stone edging\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5511383251287043
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5520.mp4",
+      "metadata": {
+        "duration_seconds": 28.880044,
+        "width": 478,
+        "height": 850,
+        "avg_frame_rate": "19395000/649801"
+      },
+      "artifact_directory": "outdoor/IMG_5520",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt surface with scattered dry grass\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.6991279702633619
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"paved walkway with scattered dry grass and weeds along edges\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5889047672972083
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"paved walkway with scattered tall grass along edges\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5520680118352175
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"paved walkway with stone blocks and grass on sides\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5851383847184479
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"paved walkway with stone blocks and grass edges\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5518870619125664
+        },
+        {
+          "timestamp_seconds": 10.0,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"no hazardous objects visible\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4356358270160854
+        },
+        {
+          "timestamp_seconds": 12.0,
+          "image": "frame_006.jpg",
+          "context_image": "context_006.jpg",
+          "raw_response": "{\n  \"ground\": \"paved walkway with rectangular stone slabs\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5308344247750938
+        },
+        {
+          "timestamp_seconds": 14.0,
+          "image": "frame_007.jpg",
+          "context_image": "context_007.jpg",
+          "raw_response": "{\n  \"ground\": \"no visible hazards\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4162456947378814
+        },
+        {
+          "timestamp_seconds": 16.0,
+          "image": "frame_008.jpg",
+          "context_image": "context_008.jpg",
+          "raw_response": "{\n  \"ground\": \"no visible hazards\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.41670850990340114
+        },
+        {
+          "timestamp_seconds": 18.0,
+          "image": "frame_009.jpg",
+          "context_image": "context_009.jpg",
+          "raw_response": "{\n  \"ground\": \"no hazardous objects visible\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4353932607918978
+        },
+        {
+          "timestamp_seconds": 20.0,
+          "image": "frame_010.jpg",
+          "context_image": "context_010.jpg",
+          "raw_response": "{\n  \"ground\": \"no hazardous objects visible\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.43489699298515916
+        },
+        {
+          "timestamp_seconds": 22.0,
+          "image": "frame_011.jpg",
+          "context_image": "context_011.jpg",
+          "raw_response": "{\n  \"ground\": \"concrete sidewalk with scattered dry leaves\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4919752567075193
+        },
+        {
+          "timestamp_seconds": 24.0,
+          "image": "frame_012.jpg",
+          "context_image": "context_012.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt sidewalk with a metal fence and bicycle nearby\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5494683678261936
+        },
+        {
+          "timestamp_seconds": 26.0,
+          "image": "frame_013.jpg",
+          "context_image": "context_013.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt surface with scattered small debris and a flower bed border\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5878350446000695
+        },
+        {
+          "timestamp_seconds": 28.0,
+          "image": "frame_014.jpg",
+          "context_image": "context_014.jpg",
+          "raw_response": "{\n  \"ground\": \"asphalt surface with scattered leaves and a chain-link fence base\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.587923675775528
+        },
+        {
+          "timestamp_seconds": 28.680044000000002,
+          "image": "frame_015.jpg",
+          "context_image": "context_015.jpg",
+          "raw_response": "{\n  \"ground\": \"concrete pavement with scattered leaves and minor cracks\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5309826610609889
+        }
+      ]
+    },
+    {
+      "video": "data/videos/outdoor/IMG_5521.mp4",
+      "metadata": {
+        "duration_seconds": 9.983854,
+        "width": 478,
+        "height": 850,
+        "avg_frame_rate": "596000/19963"
+      },
+      "artifact_directory": "outdoor/IMG_5521",
+      "frames": [
+        {
+          "timestamp_seconds": 0.0,
+          "image": "frame_000.jpg",
+          "context_image": "context_000.jpg",
+          "raw_response": "{\n  \"ground\": \"no hazardous objects visible\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.4358683009631932
+        },
+        {
+          "timestamp_seconds": 2.0,
+          "image": "frame_001.jpg",
+          "context_image": "context_001.jpg",
+          "raw_response": "{\n  \"ground\": \"paved walkway with scattered small dark objects\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5303945927880704
+        },
+        {
+          "timestamp_seconds": 4.0,
+          "image": "frame_002.jpg",
+          "context_image": "context_002.jpg",
+          "raw_response": "{\n  \"ground\": \"The ground is paved with smooth, flat stones.\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5305994306690991
+        },
+        {
+          "timestamp_seconds": 6.0,
+          "image": "frame_003.jpg",
+          "context_image": "context_003.jpg",
+          "raw_response": "{\n  \"ground\": \"paved area with scattered small stones near the curb\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5525452047586441
+        },
+        {
+          "timestamp_seconds": 8.0,
+          "image": "frame_004.jpg",
+          "context_image": "context_004.jpg",
+          "raw_response": "{\n  \"ground\": \"paved area with scattered dark rectangular blocks\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5124027510173619
+        },
+        {
+          "timestamp_seconds": 9.783854,
+          "image": "frame_005.jpg",
+          "context_image": "context_005.jpg",
+          "raw_response": "{\n  \"ground\": \"paved area with scattered dark rectangular blocks\",\n  \"prompts\": []\n}",
+          "prompts": [],
+          "error": null,
+          "inference_seconds": 0.5130053772591054
+        }
+      ]
+    }
+  ]
+}

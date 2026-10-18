@@ -1,0 +1,3 @@
+# Optional local-grid validation, installed in the GPU worker environment.
+cupy-cuda12x==13.6.0
+fastrlock==0.8.3

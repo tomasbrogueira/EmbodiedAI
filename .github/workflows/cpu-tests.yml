@@ -1,4 +1,4 @@
-name: CPU pipeline checks
+name: Six-component integration checks
 
 on:
   push:
@@ -10,12 +10,13 @@ permissions:
 
 jobs:
   contracts:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     timeout-minutes: 15
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
+    env:
+      PYTHONPATH: path-planning:orchestrator
+      OMP_NUM_THREADS: 1
+      OPENBLAS_NUM_THREADS: 1
+      MKL_NUM_THREADS: 1
     steps:
       - uses: actions/checkout@v6
         with:
@@ -24,10 +25,23 @@ jobs:
         with:
           python-version: '3.12'
           cache: pip
-          cache-dependency-path: |
-            requirements/path_mapping_cpu.txt
-            requirements/test.txt
-      - name: Install CPU test dependencies
+          cache-dependency-path: requirements/test.txt
+      - name: Check out official geometry helpers without weights
+        uses: actions/checkout@v6
+        with:
+          repository: Robbyant/lingbot-map
+          ref: 8fdf984a7f9caf391622ea5843a8410900d27ef2
+          path: lingbot-map
+          persist-credentials: false
+      - name: Install CPU and viewer dependencies
         run: python -m pip install -r requirements/test.txt
-      - name: Check shared contracts and adapters without model inference
-        run: python -m pytest -q tests
+      - name: Install CPU tensors for reconstruction wrapper tests
+        run: python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
+      - name: Compile native search
+        run: g++ -O3 -std=c++17 -ffp-contract=off -shared -fPIC path-planning/corridor_astar_feasible.cpp -o path-planning/corridor_astar_feasible.so
+      - name: Test contracts without model inference
+        run: DATASET_REPO="$PWD" DATASET_NATIVE_LIBRARY="$PWD/path-planning/corridor_astar_feasible.so" python -B -m unittest discover -s path-planning -v
+      - name: Test legacy semantic mapping entry points
+        run: python -B -m unittest discover -s plugins/small_obstacles/tests -v
+      - name: Test standalone and composed features
+        run: python -B -m unittest discover -s tests/integration -v

@@ -1,0 +1,21 @@
+{
+  "output": "/absolute/path/outside/repository/new-combined-run",
+  "inputs": {"video": "/absolute/path/to/video.mp4"},
+  "geometry": {"mode": "compute", "policy": "offline_uniform_anchors"},
+  "vlm": {"mode": "compute", "target": "non_traversable", "keyframe_step": 30},
+  "sam": {
+    "support": "compute",
+    "support_prompt": "ground",
+    "vlm_queries": "compute",
+    "extra_traversability": {"mode": "compute", "prompts": ["path"]},
+    "manual_non_traversability": {"mode": "off", "prompts": []}
+  },
+  "analysis": {"steepness": "compute", "costs": "compute"},
+  "planning": {"enabled": true, "slope_policy": "enforce"},
+  "visualizer": {"enabled": false},
+  "runtime": {
+    "lingbot_python": "/path/to/lingbot-environment/bin/python",
+    "vlm_python": "/path/to/vlm-environment/bin/python",
+    "sam_python": "/path/to/sam-environment/bin/python"
+  }
+}

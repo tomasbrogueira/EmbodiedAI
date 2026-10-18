@@ -1,140 +1,122 @@
-# EmbodiedAI: four comparable mapping pipelines
+# Integrated perception and planning
 
-This repository compares pretrained LingBot-Map reconstruction with three
-semantic alternatives on the same 18 project videos. All four use the shared
-RGB/geometry handoff, semantic voxel fusion, robot policy, planner and evaluator.
+This branch combines `path-planning-cleanup` and `vlm_improvements` into six
+components: path planner, VLM, orchestrator, SAM, LingBot-MAP and visualizer.
 
-| Pipeline ID | Meeting assignment, 8 October 2026 | Semantic evidence |
-| --- | --- | --- |
-| geometry_only | João | LingBot geometry only |
-| ground_surface | Tomás | SAM3 with the exact lowercase prompt **floor** |
-| fixed_hazards | Florian | SAM3 with a larger fixed vocabulary; concepts keep explicit surface/hazard roles |
-| qwen_hazards | Joris, tentative | A small VLM proposes words, then SAM3 segments them |
+Read [Integrated pipelines](docs/INTEGRATED_PIPELINES.md) for standalone commands,
+combined runs, feature switches, traversability targets and independent SAM queries.
+See [Validation](docs/INTEGRATION_VALIDATION.md) for the checks performed.
 
-The common runner and all four adapters are implemented. CPU fixtures exercise
-their shared artifact contract. **Real video results, accuracy and runtime still
-need pipeline-specific validation.** The meeting reported a LingBot-Map problem;
-João will address it using his working setup. Its precise cause is not established
-here. Keep that blocker distinct from historical pilots and component results.
+- VLM can propose traversable or non-traversable regions.
+- Extra SAM traversability queries such as `path` run independently alongside it.
+- Positive evidence expands support candidates; negative evidence vetoes overlaps
+  in the cost map and certified routes.
+- Steepness, cost generation and route search are separately selectable.
+- Model environments remain separate; analysis can reuse saved snapshots.
 
-~~~text
-recording -> prepared sequence -> shared LingBot geometry and processed RGB
-                                      |
-                              one semantic adapter
-                                      |
-                          geometry + per-concept voxels
-                                      |
-                         robot policy and local planning
-                                      |
-                         evaluation -> comparison report
-~~~
+The existing installation and command examples below remain available through
+compatibility entry points.
 
-A surface mask is candidate evidence. Geometry, scale, up direction and robot
-limits are separate requirements for physical traversability claims.
+# Installation
 
-## Start with a CPU fixture
+Clone the repo with ```git clone --single-branch --branch full-integration-live-planning https://github.com/tomasbrogueira/EmbodiedAI.git``` 
 
-Use Python 3.12 from the repository root. This needs no GPU, checkpoints,
-network access during execution, or initialized model submodules.
+**Note**: Use the EECS cluster with VSCode, using the terminal in VSCode.
 
-Follow the [external CPU setup](docs/local_setup.md#choose-external-storage-and-check-the-cpu-path)
-for the exact PowerShell or Linux/macOS commands. It creates a separate
-environment, redirects package and temporary caches outside the checkout,
-generates a fixture there and runs the repository tests.
+## Foundation Models
 
-Choose a fresh fixture directory for each invocation. The fixture creates three
-analytic images, a geometry cache and independent synthetic robot references,
-then calls the real run/evaluate/compare CLIs for all four IDs. Inspect
-`<asset-directory>/runs/cpu-fixture-001/comparison/comparison.json` and its metrics table.
-The common fixture adapters replace model inference; production adapter checks
-also live in [tests/pipelines](tests/pipelines/). Fixture timings are CPU software
-checks, never model performance results.
+Clone both SAM3 and Lingbot-map to the EmbodiedAI folder (main repo folder). 
 
-The repository test suite covers the shared mapping system.
-[VLM_evaluation](VLM_evaluation/README.md) has its own setup and tests.
-See [dependency scopes](requirements/README.md) for installation limitations.
+```bash
+cd EmbodiedAI
+git clone https://github.com/facebookresearch/sam3.git
+git clone https://github.com/Robbyant/lingbot-map.git
+```
 
-## Run a recording
+Follow the readme.me from each lingbot-map ([https://github.com/robbyant/lingbot-map](https://github.com/robbyant/lingbot-map)) until Step.3 (inclusive) and sam3 ([https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation](https://github.com/facebookresearch/sam3?tab=readme-ov-file#installation)) until Step.3 (but do not clone the repo again).
 
-Prepare each recording once and share its frozen sequence manifest. The current
-preparation CLI accepts a video or an ordered frame folder and a JSON config.
-Video decoding additionally needs OpenCV. Use a complete copied run config with
-local checkpoint paths and the settings described in
-[pipeline configuration](docs/pipeline_configuration.md). A minimal preparation
-config is shown in the [repository guide](docs/repository_guide.md#prepare-a-shared-sequence).
+Do not forget to copy the weights for lingbot-map from https://huggingface.co/robbyant/lingbot-map to the lingbot-map folder.
 
-~~~bash
-python src/prepare_sequence.py --input data/videos/indoor/IMG_5506.mp4 --config /path/to/prepare.json --output data/prepared/IMG_5506
-python src/run_pipeline.py --pipeline ground_surface --sequence data/prepared/IMG_5506/sequence.json --config /path/to/run.json --output runs/ground_surface/IMG_5506/attempt-001
-python src/evaluate_pipeline.py --run runs/ground_surface/IMG_5506/attempt-001 --output results/ground_surface/IMG_5506/attempt-001
-~~~
+## Install required dependencies for orchestration and visualization
 
-The configuration guide defines the preparation fields and presets. Run commands
-from the repository root; replace the two config paths with real JSON files.
-For matched quality replays, later runs use the first run's geometry cache via
-**--geometry-cache**. [Run storage](docs/run_storage.md) explains the actual
-layout, optional **--output-root** for unique attempts, and cache portability.
+```bash
+conda create -n orchestrator-visualizer python=3.10 pip -y
+conda activate orchestrator-visualizer
+pip install -r path-planning/requirements.txt
+pip install torch==2.8.0 --index-url https://download.pytorch.org/whl/cpu
+```
 
-Without independent references, evaluation still reports supported operational
-diagnostics and explicit unavailable quality metrics. When references exist,
-add **--reference /path/to/reference.json**. Compare at least two evaluation
-directories, repeating **--evaluation**:
+## Getting lingbot-map pointcloud
 
-~~~bash
-python src/compare_pipelines.py --evaluation results/geometry_only/IMG_5506/attempt-001 --evaluation results/ground_surface/IMG_5506/attempt-001 --output results/comparisons/IMG_5506-001
-~~~
+For offline recordings, path-planning/reconstruct.py initializes LingBot jointly from eight evenly spaced video views, then processes the remaining frames and restores every output to its original frame number. This reduces the observed scale drift without changing masks or planning rules. It uses future video frames and is not an online method. Rebuild the map, slopes and costs when reconstruction outputs change.
 
-Comparison checks the frozen experiment identities and reports incompatibilities.
-It cannot repair different sequences, calibration, robot policies or hardware
-budgets. Raw maps remain useful when calibrated planning is unavailable.
+```bash
+conda deactivate
+conda activate lingbot-map
+python3 path-planning/reconstruct.py \
+    --video_path data/videos/indoor/IMG_5522.mp4 \
+    --output_folder data/lingbot_output/ \
+    --model_path lingbot-map/lingbot-map.pt \
+    --mode streaming \
+    --kv_cache_sliding_window 32 \
+    --keyframe_interval 2 \
+    --num_scale_frames 8 \
+    --use_sdpa \
+    --save_predictions --no_render --no_original_video
+```
 
-## Model setup and access
+## Getting SAM3 segmentations
 
-Follow [local setup on a PC or Linux host](docs/local_setup.md) for a `main`
-clone, an external asset directory and explicit pinned model preparation.
-A normal clone includes all 18 project videos and leaves historical model
-submodules uninitialized. CPU fixtures need neither model code nor checkpoints.
-Keep model source checkouts, environments, weights, HF/Torch/pip caches,
-temporary files and bulk runs outside the project checkout.
+```bash
+conda deactivate
+conda activate sam3
+python3 path-planning/generate_masks.py \
+    --video_path data/videos/indoor/IMG_5522.mp4 \
+    --output_folder data/sam_output \
+    --prompt floor
+```
 
-The guide installs the pinned official SAM3 package from an external clean
-checkout; do not use `sam3-robot/setup.sh`, which clones unpinned upstream code.
-[Dependency scopes](requirements/README.md) describe the proposed GPU stacks;
-their pins are not a newly verified working LingBot setup. Coordinate LingBot
-environment changes with João. Keep model revisions and file hashes in the
-effective config; changing them creates a new experiment.
+**Note:** I had to dowgrade and install new libs:
 
-- Obtain LingBot's local checkpoint from [Robbyant/lingbot-map](https://huggingface.co/robbyant/lingbot-map).
-- Obtain SAM3 access and its local checkpoint from [facebook/sam3](https://huggingface.co/facebook/sam3); access approval is separate from cloning the wrapper.
-- Qwen variants use the pinned model identities in
-  [configs/pipelines](configs/pipelines/) and the separate
-  [hazard inference setup](VLM_evaluation/docs/hazard_inference.md).
+```bash
+pip install setuptools==69.5.1
+pip install pycocotools
+pip install psutil
+pip install opencv-python
+pip install matplotlib
+```
 
-Store weights and caches outside Git. Current semantic adapters require
-explicit local-only model preparation; missing weights or dependencies are
-reported, and model failures never silently switch to fixture predictions.
-The legacy fixed-hazard and Qwen templates need local paths and explicit model
-loading enabled; the newer larger-vocabulary preset already enables loading.
-SAM checkpoint paths are relative inside a cache root, unlike LingBot's path.
-Copy presets to external local configs and override absolute source/cache roots
-as shown in the setup guide. See the configuration guide before running any preset.
+## Projecting SAM3 segmentations to 3D pointcloud (orchestration)
 
-## Where to work and report
+```bash
+conda deactivate
+conda activate orchestrator-visualizer
+python orchestrator/main.py \
+    --video-path data/videos/indoor/IMG_5522.mp4 \
+    --lingbot-dir data/lingbot_output/IMG_5522 \
+    --sam-dir data/sam_output/IMG_5522_masks \
+    --output data/combined/IMG_5522_floor_semantic_map.ply \
+    --prompt floor \
+    --frame-step 2 \
+    --pixel-step 1 \
+    --min-depth-conf 2.5 \
+    --max-depth 25 \
+    --patch-size 14 \
+    --segment-color 255,0,0
+```
 
-- [Repository guide](docs/repository_guide.md): source layout, interfaces and extension points.
-- [Team workflow](docs/team_workflow.md): owners, common videos, runtime scopes, report template and Sunday handoff.
-- [Contributing](CONTRIBUTING.md): branches, review and local checks.
-- [Publication readiness](docs/release_readiness.md): prepared changes, verification and remaining research work.
-- [Pipeline status and evidence](docs/pipeline_candidates.md): implemented features and validation limits.
-- [Curated pilot evidence](reports/README.md): compact historical results retained for review.
-- [Historical implementation specifications](docs/implementation/README.md): retained design context.
+## Visualizing results
 
-Use the same [18 recordings](data/videos/README.md) for every pipeline.
-Report runtime, advantages, limitations, and concrete good/bad examples.
-The soft deadline is **Sunday 11 October 2026**; the hard deadline will be
-decided at that meeting. Compact reviewed reports can be published later;
-bulk runs, renderings, model files and caches remain outside Git.
+```bash
+python3 orchestrator/view_ply.py data/combined/IMG_5522_floor_semantic_map.ply
+```
 
-For INESC work, read the local server rules before connecting and follow the
-[server section of the team guide](docs/team_workflow.md#shared-server-work).
-Existing server jobs and results must be preserved.
+## Path planning
+
+See [path-planning](path-planning/README.md) for original-point slopes, costs, recording routes, batch tools and the three-mode Viser viewer. Keep generated outputs outside the repository.
+
+The [workflow scripts](orchestrator/scripts/README.md) run reconstruction, masks and map export using the existing KTH environments.
+
+## VLM and semantic mapping
+
+The [semantic mapping plugin](plugins/small_obstacles/README.md) supports VLM proposals and multi-query SAM masks. See the [integration plan](docs/integration_merge_plan.md) for the six-component architecture.
