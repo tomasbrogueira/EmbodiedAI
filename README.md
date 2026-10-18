@@ -19,7 +19,7 @@ compatibility entry points.
 
 # Installation
 
-Clone the repo with ```git clone --single-branch --branch non_vibed https://github.com/tomasbrogueira/EmbodiedAI.git``` 
+Clone the repo with ```git clone --single-branch --branch full-integration-live-planning https://github.com/tomasbrogueira/EmbodiedAI.git``` 
 
 **Note**: Use the EECS cluster with VSCode, using the terminal in VSCode.
 
